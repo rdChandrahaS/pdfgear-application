@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="30"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rdchandrahas.ui.DashboardController">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.rdchandrahas.ui.DashboardController"
+      spacing="30" alignment="TOP_CENTER"
+      style="-fx-background-color: transparent;">
 
-    <Label text="Choose a Tool"
-           style="-fx-font-size: 22px;" />
+    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
 
-    <GridPane hgap="30" vgap="30" alignment="CENTER">
-        <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-        </padding>
+    <VBox alignment="CENTER" spacing="10">
+        <Label text="Welcome to PDFGear" style="-fx-font-size: 32px; -fx-font-weight: bold;" />
+        <Label text="All-in-one solution for your PDF needs" style="-fx-font-size: 16px; -fx-opacity: 0.7;" />
+    </VBox>
 
-        <Button text="Merge PDF"
-                styleClass="tool-card"
-                onAction="#openMergeView"
-                GridPane.rowIndex="0"
-                GridPane.columnIndex="0"/>
-
-        <Button text="Image → PDF"
-                styleClass="tool-card"
-                onAction="#openImageView"
-                GridPane.rowIndex="0"
-                GridPane.columnIndex="1"/>
-
-        <Button text="Split PDF"
-                styleClass="tool-card"
-                onAction="#openSplitView"
-                GridPane.rowIndex="1"
-                GridPane.columnIndex="0"/>
-
-        <Button text="Compress PDF"
-                styleClass="tool-card"
-                onAction="#openCompressView"
-                GridPane.rowIndex="1"
-                GridPane.columnIndex="1"/>
-
-    </GridPane>
-
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" 
+                style="-fx-background-color: transparent; -fx-background: transparent;">
+        
+        <FlowPane fx:id="toolFlowPane" 
+                  hgap="45" vgap="45" 
+                  alignment="TOP_CENTER"
+                  columnHalignment="CENTER"
+                  prefWrapLength="1200">
+             <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+        </FlowPane>
+    </ScrollPane>
 </VBox>

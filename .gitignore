@@ -1,14 +1,24 @@
-# Maven
+# Compiled Java classes
 target/
+*.class
 
-# IntelliJ
+# IDE files
+.project
+.classpath
+.settings/
 .idea/
 *.iml
+*.iws
 
-# VS Code
-.vscode/
-
-# OS
+# OS generated files
 .DS_Store
+Thumbs.db
 
+# Temporary PDF/Image results (prevent uploading your test files)
+*.pdf
+*.jpg
+*.png
+!src/main/resources/icons/*.png
 
+# Logs
+*.log

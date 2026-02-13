@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import com.rdchandrahas.shared.component.FileListView?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="0" alignment="TOP_CENTER" styleClass="root">
+
+    <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #252525; -fx-padding: 15;">
+        <Button text="← Back" onAction="#handleBack" 
+                style="-fx-background-color: transparent; -fx-text-fill: #0078d7; -fx-font-size: 14px; -fx-cursor: hand;"/>
+        <Label fx:id="toolTitleLabel" text="Tool Name" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" />
+    </HBox>
+
+    <VBox spacing="15" VBox.vgrow="ALWAYS">
+        <padding><Insets top="20" right="25" bottom="20" left="25"/></padding>
+
+        <HBox spacing="15" alignment="CENTER_LEFT" 
+              style="-fx-background-color: #2d2d2d; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #3d3d3d; -fx-border-radius: 8;">
+            
+            <Button fx:id="addFilesBtn" text="+ Add Files" onAction="#handleAddFiles" 
+                    style="-fx-background-color: #0078d7; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;"/>
+            
+            <Separator orientation="VERTICAL" prefHeight="30" />
+
+            <HBox fx:id="customToolbarArea" spacing="10" alignment="CENTER_LEFT" />
+
+            <Button text="🗑 Clear" onAction="#handleRemove" 
+                    style="-fx-background-color: #3d3d3d; -fx-text-fill: #ff6666; -fx-padding: 8 15;"/>
+            
+            <Separator orientation="VERTICAL" prefHeight="30" />
+            <ComboBox fx:id="sortCombo" onAction="#onSortAction" prefWidth="120" promptText="Sort..." />
+            
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox spacing="0" style="-fx-border-color: #444444; -fx-border-radius: 5; -fx-padding: 1;">
+                <ToggleButton fx:id="listViewBtn" text="List" selected="true" onAction="#onListToggle" style="-fx-background-radius: 4 0 0 4;"/>
+                <ToggleButton fx:id="gridViewBtn" text="Grid" onAction="#onGridToggle" style="-fx-background-radius: 0 4 4 0;"/>
+            </HBox>
+        </HBox>
+
+        <FileListView fx:id="fileListView" VBox.vgrow="ALWAYS" 
+                      style="-fx-background-color: #121212; -fx-background-radius: 8; -fx-border-color: #333333; -fx-border-radius: 8;"/>
+
+        <HBox spacing="20" alignment="CENTER_RIGHT">
+            <ProgressIndicator fx:id="progressIndicator" visible="false" prefWidth="35" prefHeight="35"/>
+            <Button fx:id="actionBtn" text="Run Action" onAction="#handleAction"
+                    style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10 30;"/>
+        </HBox>
+    </VBox>
+</VBox>

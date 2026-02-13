@@ -1,52 +1,72 @@
 package com.rdchandrahas.ui;
 
+import com.rdchandrahas.core.NavigationService;
+import com.rdchandrahas.core.Tool;
+import com.rdchandrahas.core.ToolRegistry;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.layout.StackPane;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
+public class DashboardController implements InjectableController {
 
-public class DashboardController {
+    @FXML private FlowPane toolFlowPane;
+    private NavigationService navigationService;
+
+    @Override
+    public void setNavigationService(NavigationService navService) {
+        this.navigationService = navService;
+    }
 
     @FXML
-    private StackPane contentPane;
+    public void initialize() {
+        renderToolCards();
+        
+        // Dynamic scaling: Cards get slightly smaller if window is very narrow
+        toolFlowPane.widthProperty().addListener((obs, oldVal, newVal) -> {
+            String sizeClass = (newVal.doubleValue() < 600) ? "compact-tool" : "standard-tool";
+            toolFlowPane.getChildren().forEach(node -> {
+                node.getStyleClass().removeAll("standard-tool", "compact-tool");
+                node.getStyleClass().add(sizeClass);
+            });
+        });
+    }
 
-    private void loadView(String fxml) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/ui/" + fxml)
-            );
-            Parent view = loader.load();
-
-            // Get root layout and replace center
-            StackPane rootPane = (StackPane) view.getParent();
-            if (rootPane != null) {
-                rootPane.getChildren().setAll(view);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void renderToolCards() {
+        toolFlowPane.getChildren().clear();
+        for (Tool tool : ToolRegistry.getTools()) {
+            VBox card = createToolCard(tool);
+            toolFlowPane.getChildren().add(card);
         }
     }
 
-    @FXML
-    private void openMergeView() {
-        System.out.println("Merge clicked");
-    }
+    private VBox createToolCard(Tool tool) {
+        VBox card = new VBox(15); 
+        card.getStyleClass().add("tool-card"); 
+        card.setAlignment(Pos.CENTER);
+        
+        FontIcon icon = new FontIcon(tool.getIconCode());
+        icon.getStyleClass().add("tool-icon");
+        
+        Label title = new Label(tool.getName());
+        title.getStyleClass().add("tool-title");
 
-    @FXML
-    private void openImageView() {
-        System.out.println("Image → PDF clicked");
-    }
+        card.getChildren().addAll(icon, title);
 
-    @FXML
-    private void openSplitView() {
-        System.out.println("Split clicked");
-    }
-
-    @FXML
-    private void openCompressView() {
-        System.out.println("Compress clicked");
+        card.setOnMouseClicked(e -> {
+            switch (tool.getName()) {
+                case "Merge PDF" -> navigationService.navigateToTool(new MergeController());
+                case "Split PDF" -> navigationService.navigateToTool(new SplitController());
+                case "Compress PDF" -> navigationService.navigateToTool(new CompressController());
+                case "Image to PDF" -> navigationService.navigateToTool(new ImageToPdfController());
+                case "Protect PDF" -> navigationService.navigateToTool(new ProtectController());
+                case "Unlock PDF" -> navigationService.navigateToTool(new UnlockController());
+            }
+        });
+        
+        return card;
     }
 }

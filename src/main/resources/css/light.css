@@ -1,19 +1,79 @@
+/* Clean Fluent Light Mode */
 .root {
-    -fx-background-color: white;
+    -fx-background-color: rgba(245, 247, 251, 0.95);
+    -fx-font-family: "Segoe UI", system-ui;
 }
 
+/* FIX: Global Label Text Color */
 .label {
-    -fx-text-fill: black;
+    -fx-text-fill: #2c3e50;
 }
 
-.button {
-    -fx-background-color: #e0e0e0;
+/* ScrollPane */
+.scroll-pane, .grid-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
 }
 
+/* Grid Card (Thumbnails) */
+.grid-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 10;
+}
+
+/* Tool Card */
 .tool-card {
-    -fx-pref-width: 160px;
-    -fx-pref-height: 120px;
-    -fx-font-size: 14px;
-    -fx-background-radius: 12;
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 30;
+    -fx-min-width: 160;
+    -fx-min-height: 160;
+    -fx-max-width: 160;
+    -fx-max-height: 160;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.tool-card:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #0078d7;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.tool-icon {
+    -icon-size: 50;
+    -icon-color: #0078d7;
+}
+
+.tool-title {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Inputs */
+.button {
+    -fx-background-color: #0078d7;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.button:hover { -fx-background-color: #005a9e; }
+
+.text-field, .password-field, .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #333;
+    -fx-background-radius: 8;
+    -fx-border-color: #ccc;
 }
