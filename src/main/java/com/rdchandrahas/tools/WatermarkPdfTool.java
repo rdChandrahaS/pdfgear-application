@@ -2,16 +2,16 @@ package com.rdchandrahas.tools;
 
 import com.rdchandrahas.core.Tool;
 
-public class CompressPdfTool implements Tool {
+public class WatermarkPdfTool implements Tool {
 
     @Override
     public String getName() {
-        return "Compress PDF";
+        return "Watermark PDF";
     }
 
     @Override
     public String getDescription() {
-        return "Reduce PDF file size by percentage or to a specific target size (KB/MB).";
+        return "Add a custom text watermark to all pages of your PDF document.";
     }
 
     @Override
@@ -21,16 +21,11 @@ public class CompressPdfTool implements Tool {
 
     @Override
     public String getIconCode() {
-        return "fas-compress-arrows-alt"; 
-    }
-
-    @Override
-    public String getIconPath() {
-        return null; 
+        return "fas-stamp"; // A perfect icon for stamping watermarks
     }
 
     @Override
     public Class<?> getControllerClass() {
-        return com.rdchandrahas.ui.CompressController.class;
+        return com.rdchandrahas.ui.WatermarkController.class;
     }
 }

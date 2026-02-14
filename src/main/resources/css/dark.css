@@ -2,12 +2,11 @@
 .root {
     -fx-background-color: rgba(18, 18, 18, 0.95);
     -fx-font-family: "Segoe UI", system-ui;
+    -fx-accent: #0078d7; /* Default Accent */
 }
 
 /* Global Text */
-.label {
-    -fx-text-fill: white;
-}
+.label { -fx-text-fill: white; }
 
 /* --- Master Tool Layout Styling --- */
 .tool-header { 
@@ -36,16 +35,16 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
-.button:hover { 
-    -fx-background-color: #555555; 
-}
+.button:hover { -fx-background-color: #555555; }
+
 .primary-button { 
-    -fx-background-color: #0078d7; 
+    -fx-background-color: -fx-accent; 
     -fx-text-fill: white; 
 }
 .primary-button:hover { 
-    -fx-background-color: #005a9e; 
+    -fx-background-color: derive(-fx-accent, -20%); 
 }
+
 .danger-button { 
     -fx-background-color: transparent; 
     -fx-text-fill: #ff6666; 
@@ -60,18 +59,11 @@
     -fx-background-color: #28a745; 
     -fx-text-fill: white; 
 }
-.success-button:hover { 
-    -fx-background-color: #218838; 
-}
+.success-button:hover { -fx-background-color: #218838; }
 
 /* --- ScrollPane & Grids --- */
-.scroll-pane, .grid-scroll {
-    -fx-background-color: transparent;
-    -fx-background: transparent;
-}
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
+.scroll-pane, .grid-scroll { -fx-background-color: transparent; -fx-background: transparent; }
+.scroll-pane > .viewport { -fx-background-color: transparent; }
 .grid-card {
     -fx-background-color: #2b2b2b;
     -fx-background-radius: 10;
@@ -97,13 +89,13 @@
 }
 .tool-card:hover {
     -fx-background-color: rgba(60, 60, 60, 0.9);
-    -fx-border-color: #0078d7;
+    -fx-border-color: -fx-accent;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 .tool-icon {
     -icon-size: 50;
-    -icon-color: #0078d7;
+    -icon-color: -fx-accent;
 }
 .tool-title {
     -fx-text-fill: white;
@@ -118,52 +110,40 @@
     -fx-background-radius: 8;
     -fx-border-color: #555;
 }
+.text-field:focused, .password-field:focused, .combo-box:focused {
+    -fx-border-color: -fx-accent;
+}
 .menu-bar {
     -fx-background-color: #252525;
     -fx-border-color: #3d3d3d;
     -fx-border-width: 0 0 1 0;
 }
-.menu-bar .label {
-    -fx-text-fill: white;
-}
-.menu:hover, .menu:showing, .menu-item:focused {
-    -fx-background-color: #3d3d3d;
-}
+.menu-bar .label { -fx-text-fill: white; }
+.menu:hover, .menu:showing, .menu-item:focused { -fx-background-color: #3d3d3d; }
 .context-menu {
     -fx-background-color: #252525;
     -fx-border-color: #3d3d3d;
 }
-.menu-item .label {
-    -fx-text-fill: white;
-}
+.menu-item .label { -fx-text-fill: white; }
 
-/* --- ListView (List Mode) Styling --- */
+/* --- ListView Styling --- */
 .list-view {
     -fx-background-color: #121212;
-    -fx-control-inner-background: #121212; /* This removes the default white */
+    -fx-control-inner-background: #121212;
     -fx-background-insets: 0;
     -fx-padding: 5;
     -fx-border-color: #3d3d3d;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
 }
-
 .list-cell {
     -fx-background-color: transparent;
     -fx-text-fill: white;
     -fx-padding: 8 10 8 10;
 }
-
-.list-cell:empty {
-    -fx-background-color: transparent;
-}
-
-.list-cell:hover {
-    -fx-background-color: #2b2b2b;
-    -fx-cursor: hand;
-}
-
+.list-cell:empty { -fx-background-color: transparent; }
+.list-cell:hover { -fx-background-color: #2b2b2b; -fx-cursor: hand; }
 .list-cell:selected {
-    -fx-background-color: #0078d7;
+    -fx-background-color: -fx-accent;
     -fx-text-fill: white;
 }

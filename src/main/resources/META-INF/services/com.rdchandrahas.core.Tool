@@ -6,3 +6,9 @@ com.rdchandrahas.tools.UnlockPdfTool
 com.rdchandrahas.tools.RotatePdfTool
 com.rdchandrahas.tools.PdfToImageTool
 com.rdchandrahas.tools.ImageToPdfTool
+com.rdchandrahas.tools.WatermarkPdfTool
+com.rdchandrahas.tools.ExtractTextTool
+com.rdchandrahas.tools.DeletePagesTool
+com.rdchandrahas.tools.ExtractImagesTool
+com.rdchandrahas.tools.RearrangePagesTool
+com.rdchandrahas.tools.PageNumberTool

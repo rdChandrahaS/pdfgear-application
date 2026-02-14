@@ -1,17 +1,18 @@
+// src/main/java/com/rdchandrahas/tools/ExtractImagesTool.java
 package com.rdchandrahas.tools;
 
 import com.rdchandrahas.core.Tool;
 
-public class CompressPdfTool implements Tool {
+public class ExtractImagesTool implements Tool {
 
     @Override
     public String getName() {
-        return "Compress PDF";
+        return "Extract Images";
     }
 
     @Override
     public String getDescription() {
-        return "Reduce PDF file size by percentage or to a specific target size (KB/MB).";
+        return "Extract all embedded images from your PDF files into a folder.";
     }
 
     @Override
@@ -21,16 +22,11 @@ public class CompressPdfTool implements Tool {
 
     @Override
     public String getIconCode() {
-        return "fas-compress-arrows-alt"; 
-    }
-
-    @Override
-    public String getIconPath() {
-        return null; 
+        return "fas-images"; 
     }
 
     @Override
     public Class<?> getControllerClass() {
-        return com.rdchandrahas.ui.CompressController.class;
+        return com.rdchandrahas.ui.ExtractImagesController.class;
     }
 }

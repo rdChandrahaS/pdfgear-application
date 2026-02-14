@@ -35,7 +35,7 @@ public class TempFileManager {
     /**
      * Deletes a directory and all its contents.
      */
-    private static void cleanup(Path path) {
+    public static void cleanup(Path path) {
         try {
             Files.walk(path)
                 .sorted(Comparator.reverseOrder()) // Delete files first, then folders

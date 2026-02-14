@@ -11,10 +11,10 @@
       spacing="30" alignment="TOP_CENTER"
       style="-fx-background-color: transparent;">
 
-    <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+    <padding><Insets top="40" right="20" bottom="40" left="20"/></padding>
 
     <VBox alignment="CENTER" spacing="10">
-        <Label text="Welcome to PDFGear" style="-fx-font-size: 32px; -fx-font-weight: bold;" />
+        <Label text="Welcome to My PDF File" style="-fx-font-size: 32px; -fx-font-weight: bold;" />
         <Label text="All-in-one solution for your PDF needs" style="-fx-font-size: 16px; -fx-opacity: 0.7;" />
     </VBox>
 
@@ -22,11 +22,10 @@
                 style="-fx-background-color: transparent; -fx-background: transparent;">
         
         <FlowPane fx:id="toolFlowPane" 
-                  hgap="45" vgap="45" 
+                  hgap="30" vgap="30" 
                   alignment="TOP_CENTER"
                   columnHalignment="CENTER"
-                  prefWrapLength="1200">
-             <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                  prefWrapLength="900"> <padding><Insets top="20" right="10" bottom="20" left="10"/></padding>
         </FlowPane>
     </ScrollPane>
 </VBox>

@@ -1,17 +1,18 @@
+// src/main/java/com/rdchandrahas/tools/RearrangePagesTool.java
 package com.rdchandrahas.tools;
 
 import com.rdchandrahas.core.Tool;
 
-public class CompressPdfTool implements Tool {
+public class RearrangePagesTool implements Tool {
 
     @Override
     public String getName() {
-        return "Compress PDF";
+        return "Rearrange Pages";
     }
 
     @Override
     public String getDescription() {
-        return "Reduce PDF file size by percentage or to a specific target size (KB/MB).";
+        return "Change the order of pages in your PDF by specifying a new sequence.";
     }
 
     @Override
@@ -21,16 +22,11 @@ public class CompressPdfTool implements Tool {
 
     @Override
     public String getIconCode() {
-        return "fas-compress-arrows-alt"; 
-    }
-
-    @Override
-    public String getIconPath() {
-        return null; 
+        return "fas-random"; 
     }
 
     @Override
     public Class<?> getControllerClass() {
-        return com.rdchandrahas.ui.CompressController.class;
+        return com.rdchandrahas.ui.RearrangePagesController.class;
     }
 }
