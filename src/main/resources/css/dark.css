@@ -4,12 +4,67 @@
     -fx-font-family: "Segoe UI", system-ui;
 }
 
-/* FIX: Global Label Text Color */
+/* Global Text */
 .label {
     -fx-text-fill: white;
 }
 
-/* ScrollPane Styling */
+/* --- Master Tool Layout Styling --- */
+.tool-header { 
+    -fx-background-color: #252525; 
+    -fx-padding: 15; 
+}
+.tool-header-title { 
+    -fx-font-size: 20px; 
+    -fx-font-weight: bold; 
+    -fx-text-fill: white; 
+}
+.tool-bar { 
+    -fx-background-color: #2d2d2d; 
+    -fx-padding: 12; 
+    -fx-background-radius: 8; 
+}
+.file-list-area { 
+    -fx-background-color: #121212; 
+    -fx-background-radius: 8; 
+}
+
+/* --- Buttons --- */
+.button {
+    -fx-background-color: #3d3d3d;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.button:hover { 
+    -fx-background-color: #555555; 
+}
+.primary-button { 
+    -fx-background-color: #0078d7; 
+    -fx-text-fill: white; 
+}
+.primary-button:hover { 
+    -fx-background-color: #005a9e; 
+}
+.danger-button { 
+    -fx-background-color: transparent; 
+    -fx-text-fill: #ff6666; 
+    -fx-border-color: #ff6666;
+    -fx-border-radius: 8;
+}
+.danger-button:hover { 
+    -fx-background-color: #ff6666; 
+    -fx-text-fill: white; 
+}
+.success-button { 
+    -fx-background-color: #28a745; 
+    -fx-text-fill: white; 
+}
+.success-button:hover { 
+    -fx-background-color: #218838; 
+}
+
+/* --- ScrollPane & Grids --- */
 .scroll-pane, .grid-scroll {
     -fx-background-color: transparent;
     -fx-background: transparent;
@@ -17,8 +72,6 @@
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
-
-/* Grid Card (Thumbnails) */
 .grid-card {
     -fx-background-color: #2b2b2b;
     -fx-background-radius: 10;
@@ -26,10 +79,10 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
 }
 
-/* Tool Card */
+/* --- Dashboard Tool Cards --- */
 .tool-card {
     -fx-background-color: rgba(45, 45, 45, 0.7);
-    -fx-background-radius: 25; /* Rounded corners */
+    -fx-background-radius: 25;
     -fx-border-radius: 25;
     -fx-border-color: rgba(255, 255, 255, 0.1);
     -fx-border-width: 1;
@@ -42,60 +95,75 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 5);
     -fx-transition: all 0.3s ease-in-out;
 }
-
 .tool-card:hover {
     -fx-background-color: rgba(60, 60, 60, 0.9);
     -fx-border-color: #0078d7;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
-
 .tool-icon {
     -icon-size: 50;
     -icon-color: #0078d7;
 }
-
 .tool-title {
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
-/* Inputs */
-.button {
-    -fx-background-color: #0078d7;
-    -fx-text-fill: white;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-}
-.button:hover { -fx-background-color: #005a9e; }
-
+/* --- Inputs & Menus --- */
 .text-field, .password-field, .combo-box {
     -fx-background-color: #3d3d3d;
     -fx-text-fill: white;
     -fx-background-radius: 8;
     -fx-border-color: #555;
 }
-
 .menu-bar {
     -fx-background-color: #252525;
     -fx-border-color: #3d3d3d;
     -fx-border-width: 0 0 1 0;
 }
-
 .menu-bar .label {
     -fx-text-fill: white;
 }
-
 .menu:hover, .menu:showing, .menu-item:focused {
     -fx-background-color: #3d3d3d;
 }
-
 .context-menu {
     -fx-background-color: #252525;
     -fx-border-color: #3d3d3d;
 }
-
 .menu-item .label {
+    -fx-text-fill: white;
+}
+
+/* --- ListView (List Mode) Styling --- */
+.list-view {
+    -fx-background-color: #121212;
+    -fx-control-inner-background: #121212; /* This removes the default white */
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+    -fx-border-color: #3d3d3d;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-padding: 8 10 8 10;
+}
+
+.list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.list-cell:hover {
+    -fx-background-color: #2b2b2b;
+    -fx-cursor: hand;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0078d7;
     -fx-text-fill: white;
 }

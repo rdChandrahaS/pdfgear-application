@@ -13,4 +13,9 @@ public class CompressPdfTool implements Tool {
     public String getIconCode() { 
         return "fas-compress-arrows-alt"; 
     }
+    
+    @Override
+    public Class<?> getControllerClass() {
+        return com.rdchandrahas.ui.CompressController.class;
+    }
 }

@@ -8,6 +8,7 @@ public class FileItem {
     private final String name;
     private final long size;
     private int pageCount;
+    private File file;
 
     public FileItem(String path) {
         File file = new File(path);
@@ -48,5 +49,9 @@ public class FileItem {
     @Override
     public int hashCode() {
         return path.hashCode();
+    }
+    
+    public File getFile() {
+        return this.file;
     }
 }

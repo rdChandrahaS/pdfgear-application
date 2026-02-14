@@ -4,12 +4,71 @@
     -fx-font-family: "Segoe UI", system-ui;
 }
 
-/* FIX: Global Label Text Color */
+/* Global Text */
 .label {
     -fx-text-fill: #2c3e50;
 }
 
-/* ScrollPane */
+/* --- Master Tool Layout Styling --- */
+.tool-header { 
+    -fx-background-color: #ffffff; 
+    -fx-padding: 15; 
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+.tool-header-title { 
+    -fx-font-size: 20px; 
+    -fx-font-weight: bold; 
+    -fx-text-fill: #2c3e50; 
+}
+.tool-bar { 
+    -fx-background-color: #ffffff; 
+    -fx-padding: 12; 
+    -fx-background-radius: 8; 
+    -fx-border-color: #e0e0e0;
+}
+.file-list-area { 
+    -fx-background-color: #ffffff; 
+    -fx-background-radius: 8; 
+    -fx-border-color: #e0e0e0;
+}
+
+/* --- Buttons --- */
+.button {
+    -fx-background-color: #e0e0e0;
+    -fx-text-fill: #333333;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.button:hover { 
+    -fx-background-color: #cccccc; 
+}
+.primary-button { 
+    -fx-background-color: #0078d7; 
+    -fx-text-fill: white; 
+}
+.primary-button:hover { 
+    -fx-background-color: #005a9e; 
+}
+.danger-button { 
+    -fx-background-color: transparent; 
+    -fx-text-fill: #dc3545; 
+    -fx-border-color: #dc3545;
+    -fx-border-radius: 8;
+}
+.danger-button:hover { 
+    -fx-background-color: #dc3545; 
+    -fx-text-fill: white; 
+}
+.success-button { 
+    -fx-background-color: #28a745; 
+    -fx-text-fill: white; 
+}
+.success-button:hover { 
+    -fx-background-color: #218838; 
+}
+
+/* --- ScrollPane & Grids --- */
 .scroll-pane, .grid-scroll {
     -fx-background-color: transparent;
     -fx-background: transparent;
@@ -17,8 +76,6 @@
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
-
-/* Grid Card (Thumbnails) */
 .grid-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 10;
@@ -28,7 +85,7 @@
     -fx-border-radius: 10;
 }
 
-/* Tool Card */
+/* --- Dashboard Tool Cards --- */
 .tool-card {
     -fx-background-color: white;
     -fx-background-radius: 25;
@@ -43,37 +100,75 @@
     -fx-cursor: hand;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
 }
-
 .tool-card:hover {
     -fx-background-color: #f8f9fa;
     -fx-border-color: #0078d7;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
-
 .tool-icon {
     -icon-size: 50;
     -icon-color: #0078d7;
 }
-
 .tool-title {
     -fx-text-fill: #333333;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
-/* Inputs */
-.button {
-    -fx-background-color: #0078d7;
-    -fx-text-fill: white;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-}
-.button:hover { -fx-background-color: #005a9e; }
-
+/* --- Inputs & Menus --- */
 .text-field, .password-field, .combo-box {
     -fx-background-color: #ffffff;
-    -fx-text-fill: #333;
+    -fx-text-fill: #333333;
     -fx-background-radius: 8;
-    -fx-border-color: #ccc;
+    -fx-border-color: #cccccc;
+}
+.menu-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+}
+.menu-bar .label {
+    -fx-text-fill: #333333;
+}
+.menu:hover, .menu:showing, .menu-item:focused {
+    -fx-background-color: #e0e0e0;
+}
+.context-menu {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+}
+.menu-item .label {
+    -fx-text-fill: #333333;
+}
+
+/* --- ListView (List Mode) Styling --- */
+.list-view {
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #333333;
+    -fx-padding: 8 10 8 10;
+}
+
+.list-cell:empty {
+    -fx-background-color: transparent;
+}
+
+.list-cell:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-cursor: hand;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0078d7;
+    -fx-text-fill: white;
 }

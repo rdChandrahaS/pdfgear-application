@@ -11,4 +11,9 @@ public class MergePdfTool implements Tool {
 
     @Override
     public String getIconCode() { return "fas-layer-group"; }
+    
+    @Override
+    public Class<?> getControllerClass() {
+        return com.rdchandrahas.ui.MergeController.class;
+    }
 }

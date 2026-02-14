@@ -15,6 +15,11 @@ public class UnlockPdfTool implements Tool {
 
     @Override
     public String getIconCode() {
-        return "fas-unlock"; // Ikonli FontAwesome unlock icon
+        return "fas-unlock"; 
+    }
+    
+    @Override
+    public Class<?> getControllerClass() {
+        return com.rdchandrahas.ui.UnlockController.class;
     }
 }

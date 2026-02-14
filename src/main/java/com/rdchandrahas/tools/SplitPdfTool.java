@@ -13,4 +13,9 @@ public class SplitPdfTool implements Tool {
     public String getIconCode() { 
         return "fas-cut";
     }
+    
+    @Override
+    public Class<?> getControllerClass() {
+        return com.rdchandrahas.ui.SplitController.class;
+    }
 }

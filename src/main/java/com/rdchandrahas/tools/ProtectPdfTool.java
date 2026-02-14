@@ -15,6 +15,11 @@ public class ProtectPdfTool implements Tool {
 
     @Override
     public String getIconCode() {
-        return "fas-lock"; // Ikonli FontAwesome lock icon
+        return "fas-lock";
+    }
+    
+    @Override
+    public Class<?> getControllerClass() {
+        return com.rdchandrahas.ui.ProtectController.class;
     }
 }
