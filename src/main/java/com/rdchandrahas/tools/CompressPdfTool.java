@@ -46,12 +46,12 @@ public class CompressPdfTool implements Tool {
     }
 
     /**
-     * No custom image path is used for this tool, as it relies on font icons.
-     * @return null
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return null; 
+        return "/icons/tools/compress_pdf.png";
     }
 
     /**

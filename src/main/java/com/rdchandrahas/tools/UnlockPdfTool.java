@@ -46,12 +46,12 @@ public class UnlockPdfTool implements Tool {
     }
 
     /**
-     * Explicitly implements the default icon path method for consistency.
-     * @return null as it uses font icons.
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return null;
+        return "/icons/tools/unlock_pdf.png";
     }
 
     /**

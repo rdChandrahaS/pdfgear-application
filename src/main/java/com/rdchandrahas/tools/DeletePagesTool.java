@@ -46,12 +46,12 @@ public class DeletePagesTool implements Tool {
     }
 
     /**
-     * Explicitly implements the default icon path method to ensure consistency.
-     * @return null as it uses font icons by default.
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return null;
+        return "/icons/tools/delete_pages_pdf.png";
     }
 
     /**

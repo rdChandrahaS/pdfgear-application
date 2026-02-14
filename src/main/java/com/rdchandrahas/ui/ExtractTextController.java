@@ -39,18 +39,19 @@ public class ExtractTextController extends BaseToolController {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
         File dest = chooser.showSaveDialog(actionBtn.getScene().getWindow());
 
-        if (dest == null) return;
+        if (dest == null)
+            return;
 
         setBusy(true, actionBtn);
 
         ExecutionManager.submit(() -> {
             try (FileWriter writer = new FileWriter(dest)) {
-                
+
                 PDFTextStripper textStripper = new PDFTextStripper();
-                
+
                 for (Object obj : fileListView.getItems()) {
                     FileItem item = (FileItem) obj;
-                    
+
                     // Add a header if merging multiple files
                     if (fileListView.getItems().size() > 1) {
                         writer.write("\n\n--- Document: " + new File(item.getPath()).getName() + " ---\n\n");
@@ -67,7 +68,7 @@ public class ExtractTextController extends BaseToolController {
                     setBusy(false, actionBtn);
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Text extracted and saved successfully!");
                 });
-                
+
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     setBusy(false, actionBtn);
@@ -75,5 +76,19 @@ public class ExtractTextController extends BaseToolController {
                 });
             }
         });
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

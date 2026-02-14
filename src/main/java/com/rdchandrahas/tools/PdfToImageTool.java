@@ -46,12 +46,12 @@ public class PdfToImageTool implements Tool {
     }
 
     /**
-     * Explicitly implements the default icon path method for consistency across Tool implementations.
-     * @return null as it uses font icons.
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return null; 
+        return "/icons/tools/pdf_to_image.png";
     }
 
     /**

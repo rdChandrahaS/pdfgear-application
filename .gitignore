@@ -22,3 +22,17 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Project Output
+target/
+dist/
+
+# JavaFX / jlink outputs
+pdfgear-image/
+pdfgear-dist/
+
+# Packaging temp files
+*.deb
+*.exe
+*.msi
+*.rpm

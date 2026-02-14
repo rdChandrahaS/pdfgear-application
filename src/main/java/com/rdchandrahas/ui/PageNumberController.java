@@ -25,7 +25,7 @@ public class PageNumberController extends BaseToolController {
     private ComboBox<String> positionCombo;
     private ComboBox<String> styleCombo;
     private ComboBox<String> langCombo;
-    private ComboBox<String> fontCombo; 
+    private ComboBox<String> fontCombo;
     private ComboBox<String> sizeCombo;
     private ColorPicker colorPicker;
 
@@ -35,7 +35,8 @@ public class PageNumberController extends BaseToolController {
         setActionText("Apply Numbers");
 
         positionCombo = new ComboBox<>();
-        positionCombo.getItems().addAll("Bottom Center", "Bottom Right", "Bottom Left", "Top Center", "Top Right", "Top Left");
+        positionCombo.getItems().addAll("Bottom Center", "Bottom Right", "Bottom Left", "Top Center", "Top Right",
+                "Top Left");
         positionCombo.getSelectionModel().selectFirst();
 
         styleCombo = new ComboBox<>();
@@ -53,15 +54,16 @@ public class PageNumberController extends BaseToolController {
 
         fontCombo = new ComboBox<>();
         fontCombo.getItems().add("Standard (Helvetica)");
-        loadAvailableFonts(); 
+        loadAvailableFonts();
         fontCombo.getSelectionModel().selectFirst();
 
         colorPicker = new ColorPicker(javafx.scene.paint.Color.BLACK);
 
         // UI Layout using VBox to organize two rows of controls in the toolbar
         HBox row1 = new HBox(10, new Label("Position:"), positionCombo, new Label("Style:"), styleCombo);
-        HBox row2 = new HBox(10, new Label("Language:"), langCombo, new Label("Font:"), fontCombo, new Label("Size:"), sizeCombo, colorPicker);
-        
+        HBox row2 = new HBox(10, new Label("Language:"), langCombo, new Label("Font:"), fontCombo, new Label("Size:"),
+                sizeCombo, colorPicker);
+
         addToolbarItem(new VBox(10, row1, row2));
     }
 
@@ -75,7 +77,8 @@ public class PageNumberController extends BaseToolController {
         // Validation for Bengali/Hindi
         String lang = langCombo.getValue();
         if ((lang.equals("Bengali") || lang.equals("Hindi")) && fontCombo.getValue().equals("Standard (Helvetica)")) {
-            showAlert(Alert.AlertType.WARNING, "Font Required", "Please select a custom .ttf font from the list to display Bengali or Hindi characters.");
+            showAlert(Alert.AlertType.WARNING, "Font Required",
+                    "Please select a custom .ttf font from the list to display Bengali or Hindi characters.");
             return;
         }
 
@@ -87,7 +90,8 @@ public class PageNumberController extends BaseToolController {
             if (filePaths.size() > 1) {
                 mergeDocumentsSafe(filePaths, destination);
             } else {
-                Files.copy(new File(filePaths.get(0)).toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(new File(filePaths.get(0)).toPath(), destination.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
             }
 
             // 2. Load and process
@@ -100,19 +104,21 @@ public class PageNumberController extends BaseToolController {
                 for (int i = 0; i < totalPages; i++) {
                     PDPage page = doc.getPage(i);
                     String text = formatPageText(i + 1, totalPages, styleCombo.getValue(), langCombo.getValue());
-                    
-                    try (PDPageContentStream cs = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
+
+                    try (PDPageContentStream cs = new PDPageContentStream(doc, page,
+                            PDPageContentStream.AppendMode.APPEND, true, true)) {
                         cs.beginText();
                         cs.setFont(font, fontSize);
-                        cs.setNonStrokingColor((float)fxColor.getRed(), (float)fxColor.getGreen(), (float)fxColor.getBlue());
-                        
+                        cs.setNonStrokingColor((float) fxColor.getRed(), (float) fxColor.getGreen(),
+                                (float) fxColor.getBlue());
+
                         PDRectangle mediabox = page.getMediaBox();
                         // Calculate exact text width for perfect centering/alignment
                         float textWidth = font.getStringWidth(text) / 1000 * fontSize;
-                        
+
                         float x = calculateX(positionCombo.getValue(), mediabox, textWidth);
                         float y = calculateY(positionCombo.getValue(), mediabox);
-                        
+
                         cs.newLineAtOffset(x, y);
                         cs.showText(text);
                         cs.endText();
@@ -128,16 +134,18 @@ public class PageNumberController extends BaseToolController {
         if (selectedName.equals("Standard (Helvetica)")) {
             return PDType1Font.HELVETICA;
         }
-        
+
         File fontFile = new File("fonts", selectedName + ".ttf");
-        if (!fontFile.exists()) return PDType1Font.HELVETICA; // Fallback
-        
+        if (!fontFile.exists())
+            return PDType1Font.HELVETICA; // Fallback
+
         return PDType0Font.load(doc, fontFile);
     }
 
     private void loadAvailableFonts() {
         File fontDir = new File("fonts");
-        if (!fontDir.exists()) fontDir.mkdirs();
+        if (!fontDir.exists())
+            fontDir.mkdirs();
         File[] files = fontDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".ttf"));
         if (files != null) {
             for (File file : files) {
@@ -171,14 +179,31 @@ public class PageNumberController extends BaseToolController {
 
     private float calculateX(String pos, PDRectangle box, float textWidth) {
         float margin = 30;
-        if (pos.contains("Left")) return margin;
-        if (pos.contains("Right")) return box.getWidth() - margin - textWidth;
+        if (pos.contains("Left"))
+            return margin;
+        if (pos.contains("Right"))
+            return box.getWidth() - margin - textWidth;
         return (box.getWidth() - textWidth) / 2; // Center
     }
 
     private float calculateY(String pos, PDRectangle box) {
         float margin = 30;
-        if (pos.contains("Top")) return box.getHeight() - margin;
+        if (pos.contains("Top"))
+            return box.getHeight() - margin;
         return margin; // Bottom
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

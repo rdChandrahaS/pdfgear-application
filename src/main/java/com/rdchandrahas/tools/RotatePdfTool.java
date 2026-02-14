@@ -37,12 +37,12 @@ public class RotatePdfTool implements Tool {
     }
     
     /**
-     * Provides the resource path for a custom image icon.
-     * @return The path to the PDF icon asset.
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return "/icons/pdf.png"; 
+        return "/icons/tools/rotate_pdf.png";
     }
 
     /**

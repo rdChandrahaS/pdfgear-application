@@ -22,10 +22,10 @@
                 style="-fx-background-color: transparent; -fx-background: transparent;">
         
         <FlowPane fx:id="toolFlowPane" 
-                  hgap="30" vgap="30" 
-                  alignment="TOP_CENTER"
+                  hgap="50" vgap="50"  alignment="TOP_CENTER"
                   columnHalignment="CENTER"
-                  prefWrapLength="900"> <padding><Insets top="20" right="10" bottom="20" left="10"/></padding>
+                  prefWrapLength="900"> 
+            <padding><Insets top="20" right="10" bottom="20" left="10"/></padding>
         </FlowPane>
     </ScrollPane>
 </VBox>

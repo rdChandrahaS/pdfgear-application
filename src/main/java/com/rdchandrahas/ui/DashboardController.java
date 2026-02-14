@@ -80,8 +80,17 @@ public class DashboardController implements InjectableController {
                 InputStream imageStream = getClass().getResourceAsStream(tool.getIconPath());
                 if (imageStream != null) {
                     ImageView imageView = new ImageView(new Image(imageStream));
-                    imageView.setFitWidth(50);
-                    imageView.setFitHeight(50);
+                    
+                    // 1. MAKE IMAGE LARGER (Covers more button space)
+                    imageView.setFitWidth(100);
+                    imageView.setFitHeight(100);
+                    
+                    // 2. OVAL EDGES (Clips the square white corners into an oval)
+                    javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(100, 100);
+                    clip.setArcWidth(45); // Adjust for roundness
+                    clip.setArcHeight(45);
+                    imageView.setClip(clip);
+
                     imageView.getStyleClass().add("tool-image-icon"); 
                     iconNode = imageView;
                 }

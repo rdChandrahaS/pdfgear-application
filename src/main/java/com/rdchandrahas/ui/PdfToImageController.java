@@ -51,11 +51,12 @@ public class PdfToImageController extends BaseToolController {
         chooser.setTitle("Select Destination Folder");
         File destDir = chooser.showDialog(actionBtn.getScene().getWindow());
 
-        if (destDir == null) return;
+        if (destDir == null)
+            return;
 
         String format = formatCombo.getValue().toLowerCase();
         int dpi = dpiCombo.getValue().contains("300") ? 300 : 150;
-        
+
         ImageType imageType = format.equals("png") ? ImageType.ARGB : ImageType.RGB;
 
         setBusy(true, actionBtn);
@@ -69,7 +70,7 @@ public class PdfToImageController extends BaseToolController {
 
                     try (PDDocument doc = loadDocumentSafe(item.getPath())) {
                         PDFRenderer renderer = new PDFRenderer(doc);
-                        
+
                         for (int i = 0; i < doc.getNumberOfPages(); i++) {
                             BufferedImage image = renderer.renderImageWithDPI(i, dpi, imageType);
                             File outputFile = new File(destDir, baseName + "_page_" + (i + 1) + "." + format);
@@ -89,5 +90,19 @@ public class PdfToImageController extends BaseToolController {
                 });
             }
         }).start();
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

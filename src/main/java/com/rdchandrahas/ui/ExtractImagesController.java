@@ -40,7 +40,8 @@ public class ExtractImagesController extends BaseToolController {
         chooser.setTitle("Select Destination Folder");
         File destDir = chooser.showDialog(actionBtn.getScene().getWindow());
 
-        if (destDir == null) return;
+        if (destDir == null)
+            return;
 
         setBusy(true, actionBtn);
 
@@ -56,12 +57,13 @@ public class ExtractImagesController extends BaseToolController {
                         int pageNum = 1;
                         for (PDPage page : doc.getPages()) {
                             PDResources resources = page.getResources();
-                            if (resources == null) continue;
+                            if (resources == null)
+                                continue;
 
                             int imageNum = 1;
                             for (COSName name : resources.getXObjectNames()) {
                                 PDXObject xObject = resources.getXObject(name);
-                                
+
                                 if (xObject instanceof PDImageXObject pdImage) {
                                     BufferedImage bImage = pdImage.getImage();
                                     if (bImage != null) {
@@ -73,7 +75,7 @@ public class ExtractImagesController extends BaseToolController {
 
                                         String fileName = baseName + "_p" + pageNum + "_img" + imageNum + "." + format;
                                         File outputFile = new File(destDir, fileName);
-                                        
+
                                         ImageIO.write(bImage, format, outputFile);
                                         imageNum++;
                                         totalExtracted++;
@@ -89,9 +91,11 @@ public class ExtractImagesController extends BaseToolController {
                 Platform.runLater(() -> {
                     setBusy(false, actionBtn);
                     if (finalCount > 0) {
-                        showAlert(Alert.AlertType.INFORMATION, "Success", "Extracted " + finalCount + " images successfully!");
+                        showAlert(Alert.AlertType.INFORMATION, "Success",
+                                "Extracted " + finalCount + " images successfully!");
                     } else {
-                        showAlert(Alert.AlertType.INFORMATION, "No Images", "No images were found inside the provided PDF(s).");
+                        showAlert(Alert.AlertType.INFORMATION, "No Images",
+                                "No images were found inside the provided PDF(s).");
                     }
                 });
             } catch (Exception e) {
@@ -101,5 +105,19 @@ public class ExtractImagesController extends BaseToolController {
                 });
             }
         }).start();
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

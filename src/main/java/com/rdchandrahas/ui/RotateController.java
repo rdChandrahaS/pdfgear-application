@@ -71,12 +71,13 @@ public class RotateController extends BaseToolController {
             if (filePaths.size() > 1) {
                 mergeDocumentsSafe(filePaths, destination);
             } else {
-                Files.copy(new File(filePaths.get(0)).toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(new File(filePaths.get(0)).toPath(), destination.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
             }
 
             try (PDDocument doc = loadDocumentSafe(destination.getAbsolutePath())) {
                 Set<Integer> pagesToRotate = parsePageRange(rangeText, doc.getNumberOfPages());
-                
+
                 int pageNum = 1;
                 for (PDPage page : doc.getPages()) {
                     if (pagesToRotate.contains(pageNum)) {
@@ -104,7 +105,7 @@ public class RotateController extends BaseToolController {
         new Thread(() -> {
             try (PDDocument doc = loadDocumentSafe(firstItem.getPath())) {
                 Set<Integer> pagesToRotate = parsePageRange(rangeText, doc.getNumberOfPages());
-                
+
                 int firstRequestedPage = pagesToRotate.isEmpty() ? 1 : pagesToRotate.iterator().next();
                 final int pageToPreview = Math.min(firstRequestedPage, doc.getNumberOfPages());
 
@@ -134,13 +135,13 @@ public class RotateController extends BaseToolController {
         imageView.setPreserveRatio(true);
         imageView.setFitHeight(500);
         imageView.setFitWidth(500);
-        
+
         imageView.setRotate(rotationAngle);
 
         VBox layout = new VBox(15, imageView);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
-        layout.setStyle("-fx-background-color: #252525;"); 
+        layout.setStyle("-fx-background-color: #252525;");
 
         Scene scene = new Scene(layout, 600, 600);
         previewStage.setScene(scene);
@@ -158,23 +159,26 @@ public class RotateController extends BaseToolController {
     private Set<Integer> parsePageRange(String rangeText, int maxPages) {
         Set<Integer> pages = new HashSet<>();
         if (rangeText == null || rangeText.trim().isEmpty()) {
-            for (int i = 1; i <= maxPages; i++) pages.add(i);
+            for (int i = 1; i <= maxPages; i++)
+                pages.add(i);
             return pages;
         }
 
         String normalizedText = rangeText.replaceAll("\\s+", ",");
         String[] parts = normalizedText.split(",");
-        
+
         for (String part : parts) {
             part = part.trim();
-            if (part.isEmpty()) continue;
-            
+            if (part.isEmpty())
+                continue;
+
             try {
                 if (part.contains("-")) {
                     String[] bounds = part.split("-");
                     int start = Integer.parseInt(bounds[0].trim());
                     int end = Integer.parseInt(bounds[1].trim());
-                    for (int i = start; i <= end; i++) pages.add(i);
+                    for (int i = start; i <= end; i++)
+                        pages.add(i);
                 } else {
                     pages.add(Integer.parseInt(part));
                 }
@@ -182,5 +186,19 @@ public class RotateController extends BaseToolController {
             }
         }
         return pages;
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

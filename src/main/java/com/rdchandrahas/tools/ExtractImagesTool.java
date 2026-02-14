@@ -46,14 +46,13 @@ public class ExtractImagesTool implements Tool {
     }
 
     /**
-     * Explicitly implements the default icon path method to ensure consistency.
-     * @return null as it uses font icons by default.
+     * Custom images for tool logo.
+     * @return image path
      */
     @Override
     public String getIconPath() {
-        return null;
+        return "/icons/tools/extract_image_pdf.png";
     }
-
     /**
      * Returns the specific controller class that manages the logic for image extraction.
      * @return The ExtractImagesController class type.

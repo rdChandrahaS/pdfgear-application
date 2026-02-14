@@ -7,6 +7,7 @@ import com.rdchandrahas.ui.SortableToolController;
 import com.rdchandrahas.shared.component.FileListView;
 import com.rdchandrahas.shared.model.FileItem;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -18,6 +19,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,17 +41,65 @@ public abstract class BaseToolController implements SortableToolController, Inje
 
     protected NavigationService navigationService;
 
+    /**
+     * Creates a dynamic memory setting for PDF processing.
+     * This can be further linked to the memory limit set in your MainController.
+     */
+    protected MemoryUsageSetting getMemorySetting() {
+        // Uses the 500MB mixed strategy you mentioned, or falls back to disk if needed
+        return MemoryUsageSetting.setupMixed(500L * 1024L * 1024L);
+    }
+
     @FXML
     public void initialize() {
         setupSortAndViews();
+        
+        // --- SMART BUTTON LISTENER ---
+        // Listens to the file list and updates the button color/state instantly
+        fileListView.getItems().addListener((ListChangeListener<FileItem>) c -> {
+            updateActionBtnState();
+        });
+
         onInitialize(); 
+        
+        // Set the initial state of the button
+        updateActionBtnState(); 
     }
 
     /**
-     * Hook for subclasses to perform specific initialization logic 
-     * after the base UI setup is complete.
+     * Hook for subclasses to perform specific initialization logic.
      */
     protected abstract void onInitialize();
+
+    // --- Dynamic UI State Management ---
+
+    /**
+     * Updates the Action Button styling based on current validation.
+     */
+    protected void updateActionBtnState() {
+        actionBtn.getStyleClass().removeAll("action-button", "success-button", "danger-button", "button");
+
+        if (fileListView.getItems().isEmpty()) {
+            // EMPTY -> Neutral grey, Disabled
+            actionBtn.setDisable(true);
+            actionBtn.getStyleClass().add("button");
+        } else if (isInputValid()) {
+            // ALL FILES OK -> Green (action-button style), Enabled
+            actionBtn.setDisable(false);
+            actionBtn.getStyleClass().add("action-button");
+        } else {
+            // ERROR / INVALID FILES -> Red (danger-button style), Disabled
+            actionBtn.setDisable(true);
+            actionBtn.getStyleClass().add("danger-button");
+        }
+    }
+
+    /**
+     * Logic for file validation. Override in specific tool controllers.
+     */
+    protected boolean isInputValid() {
+        return !fileListView.getItems().isEmpty();
+    }
 
     // --- UI Configuration Helpers ---
     protected void setTitle(String title) { toolTitleLabel.setText(title); }
@@ -57,9 +107,8 @@ public abstract class BaseToolController implements SortableToolController, Inje
     protected void addToolbarItem(Node... nodes) { customToolbarArea.getChildren().addAll(nodes); }
 
     /**
-     * Opens a system FileChooser and adds selected files to the shared list.
-     * @param filterName Description of the allowed files.
-     * @param extensions File extensions (e.g., "*.pdf", "*.jpg").
+     * Opens a FileChooser and adds selected files to the list using BATCH processing
+     * to prevent UI lag when adding thousands of files at once.
      */
     protected void addFiles(String filterName, String... extensions) {
         FileChooser chooser = new FileChooser();
@@ -67,10 +116,13 @@ public abstract class BaseToolController implements SortableToolController, Inje
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(filterName, extensions));
         List<File> files = chooser.showOpenMultipleDialog(addFilesBtn.getScene().getWindow());
         
-        if (files != null) {
+        if (files != null && !files.isEmpty()) {
+            List<FileItem> newItems = new ArrayList<>();
             for (File file : files) {
-                fileListView.getItems().add(new FileItem(file.getAbsolutePath()));
+                newItems.add(new FileItem(file.getAbsolutePath()));
             }
+            // Pushing all at once ensures the validation listener only runs once
+            fileListView.getItems().addAll(newItems);
         }
     }
 
@@ -83,15 +135,19 @@ public abstract class BaseToolController implements SortableToolController, Inje
     @FXML protected void onSortAction() { handleSort(); }
     @FXML protected void onListToggle() { switchToList(); }
     @FXML protected void onGridToggle() { switchToGrid(); }
-    @FXML protected void handleRemove() { fileListView.getItems().clear(); }
+    
+    @FXML 
+    protected void handleRemove() { 
+        fileListView.getItems().clear(); 
+        updateActionBtnState(); 
+    }
 
     /**
-     * Standardized workflow for processing PDF tasks.
-     * Opens a save dialog, runs the task on a background thread, and handles UI updates.
+     * Standardized background processing workflow for PDF tasks.
      */
     protected void processWithSaveDialog(String title, String defaultName, ToolTask task) {
-        if (fileListView.getItems().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "No files", "Please add files first.");
+        if (!isInputValid()) {
+            showAlert(Alert.AlertType.WARNING, "Invalid Input", "Please check your file requirements.");
             return;
         }
         
@@ -120,24 +176,24 @@ public abstract class BaseToolController implements SortableToolController, Inje
         });
     }
 
-    // --- PDF Safe Methods (Memory Optimized) ---
+    // --- PDF Safe Methods (Hybrid Memory Optimized) ---
     protected PDDocument loadDocumentSafe(String path) throws IOException {
-        return PDDocument.load(new File(path), MemoryUsageSetting.setupTempFileOnly());
+        return PDDocument.load(new File(path), getMemorySetting());
     }
     
     protected PDDocument loadDocumentSafe(String path, String pass) throws IOException {
-        return PDDocument.load(new File(path), pass, MemoryUsageSetting.setupTempFileOnly());
+        return PDDocument.load(new File(path), pass, getMemorySetting());
     }
     
     protected PDDocument createDocumentSafe() {
-        return new PDDocument(MemoryUsageSetting.setupTempFileOnly());
+        return new PDDocument(getMemorySetting());
     }
     
     protected void mergeDocumentsSafe(List<String> paths, File dest) throws IOException {
         PDFMergerUtility m = new PDFMergerUtility();
         m.setDestinationFileName(dest.getAbsolutePath());
         for (String p : paths) m.addSource(new File(p));
-        m.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
+        m.mergeDocuments(getMemorySetting());
     }
 
     // --- Interface Implementations ---
@@ -147,16 +203,12 @@ public abstract class BaseToolController implements SortableToolController, Inje
     @Override public ToggleButton getGridViewBtn() { return gridViewBtn; }
     @Override public void setNavigationService(NavigationService nav) { this.navigationService = nav; }
 
-    /**
-     * Toggles the busy state of the UI, showing the progress indicator 
-     * and disabling the primary action button.
-     */
     protected void setBusy(boolean b, Button btn) {
         progressIndicator.setVisible(b);
         btn.setDisable(b);
+        if(!b) updateActionBtnState(); 
     }
 
-    /** Helper to show JavaFX alerts. */
     protected void showAlert(Alert.AlertType t, String title, String content) {
         Alert a = new Alert(t); 
         a.setTitle(title); 
@@ -165,7 +217,6 @@ public abstract class BaseToolController implements SortableToolController, Inje
         a.show();
     }
 
-    /** Functional interface for background PDF operations. */
     @FunctionalInterface 
     public interface ToolTask { 
         void execute(File destination) throws Exception; 

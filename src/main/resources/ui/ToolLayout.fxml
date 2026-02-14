@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 <?import com.rdchandrahas.shared.component.FileListView?>
 
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="0" alignment="TOP_CENTER" styleClass="root">
 
-    <HBox spacing="20" styleClass="tool-header">
+    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="tool-header">
         <Button text="← Back" onAction="#handleBack" styleClass="back-button"/>
         <Label fx:id="toolTitleLabel" text="Tool Name" styleClass="tool-header-title" />
+        <Region HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <VBox spacing="15" VBox.vgrow="ALWAYS">
-        <padding><Insets top="20" right="25" bottom="20" left="25"/></padding>
+    <VBox spacing="20" VBox.vgrow="ALWAYS" styleClass="tool-content-area">
+        <padding><Insets top="25" right="30" bottom="25" left="30"/></padding>
 
         <HBox spacing="15" alignment="CENTER_LEFT" styleClass="tool-bar">
             <Button fx:id="addFilesBtn" text="+ Add Files" onAction="#handleAddFiles" styleClass="primary-button"/>
             <Separator orientation="VERTICAL" prefHeight="30" />
+            
             <HBox fx:id="customToolbarArea" spacing="10" alignment="CENTER_LEFT" />
-            <Button text="🗑 Clear" onAction="#handleRemove" styleClass="danger-button"/>
-            <Separator orientation="VERTICAL" prefHeight="30" />
-            <ComboBox fx:id="sortCombo" onAction="#onSortAction" prefWidth="120" promptText="Sort..." />
+            
             <Region HBox.hgrow="ALWAYS" />
-            <HBox spacing="0" styleClass="view-toggle-group">
-                <ToggleButton fx:id="listViewBtn" text="List" onAction="#onListToggle" />
-                <ToggleButton fx:id="gridViewBtn" text="Grid" onAction="#onGridToggle" />
+            
+            <ComboBox fx:id="sortCombo" onAction="#onSortAction" prefWidth="130" promptText="Sort Files..." />
+            
+            <HBox styleClass="segmented-button-bar">
+                <ToggleButton fx:id="listViewBtn" text="List" onAction="#onListToggle" styleClass="left-pill"/>
+                <ToggleButton fx:id="gridViewBtn" text="Grid" onAction="#onGridToggle" styleClass="right-pill"/>
             </HBox>
+            
+            <Separator orientation="VERTICAL" prefHeight="30" />
+            <Button text="🗑 Clear All" onAction="#handleRemove" styleClass="danger-button"/>
         </HBox>
 
-        <FileListView fx:id="fileListView" VBox.vgrow="ALWAYS" styleClass="file-list-area"/>
+        <VBox VBox.vgrow="ALWAYS" styleClass="file-list-container">
+            <FileListView fx:id="fileListView" VBox.vgrow="ALWAYS" styleClass="file-list-area"/>
+        </VBox>
 
-        <HBox spacing="20" alignment="CENTER_RIGHT">
-            <ProgressIndicator fx:id="progressIndicator" visible="false" />
-            <Button fx:id="actionBtn" text="Run Action" onAction="#handleAction" styleClass="success-button"/>
+        <HBox spacing="15" alignment="CENTER_RIGHT" styleClass="bottom-action-bar">
+            <ProgressIndicator fx:id="progressIndicator" visible="false" prefHeight="25" prefWidth="25"/>
+            <Button fx:id="actionBtn" text="Run Action" onAction="#handleAction" styleClass="action-button"/>
         </HBox>
     </VBox>
 </VBox>

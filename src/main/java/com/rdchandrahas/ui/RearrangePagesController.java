@@ -39,13 +39,14 @@ public class RearrangePagesController extends BaseToolController {
         }
 
         processWithSaveDialog("Save Rearranged PDF", "rearranged_document.pdf", (destination) -> {
-            
-            // If multiple files are added, this processes only the first one to avoid logic conflicts.
+
+            // If multiple files are added, this processes only the first one to avoid logic
+            // conflicts.
             // To merge them all first, reuse the merge logic from previous controllers.
             FileItem firstItem = (FileItem) fileListView.getItems().get(0);
 
             try (PDDocument sourceDoc = loadDocumentSafe(firstItem.getPath());
-                 PDDocument finalDoc = createDocumentSafe()) {
+                    PDDocument finalDoc = createDocumentSafe()) {
 
                 int maxPages = sourceDoc.getNumberOfPages();
                 List<Integer> newOrder = parsePageOrder(orderText, maxPages);
@@ -71,24 +72,43 @@ public class RearrangePagesController extends BaseToolController {
         String[] parts = normalizedText.split(",");
 
         for (String part : parts) {
-            if (part.isEmpty()) continue;
+            if (part.isEmpty())
+                continue;
             try {
                 if (part.contains("-")) {
                     String[] bounds = part.split("-");
                     int start = Integer.parseInt(bounds[0]);
                     int end = Integer.parseInt(bounds[1]);
 
-                    // Advanced feature: Supports reversing order (e.g., 10-5 adds pages 10,9,8,7,6,5)
+                    // Advanced feature: Supports reversing order (e.g., 10-5 adds pages
+                    // 10,9,8,7,6,5)
                     if (start <= end) {
-                        for (int i = start; i <= end; i++) pages.add(i);
+                        for (int i = start; i <= end; i++)
+                            pages.add(i);
                     } else {
-                        for (int i = start; i >= end; i--) pages.add(i);
+                        for (int i = start; i >= end; i--)
+                            pages.add(i);
                     }
                 } else {
                     pages.add(Integer.parseInt(part));
                 }
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
         return pages;
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

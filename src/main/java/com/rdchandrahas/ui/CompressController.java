@@ -24,7 +24,7 @@ import java.nio.file.StandardCopyOption;
 
 /**
  * CompressController manages the logic for reducing PDF file sizes.
- * It features an iterative compression engine that progressively adjust image 
+ * It features an iterative compression engine that progressively adjust image
  * quality and dimensions to meet a specific target size or percentage.
  */
 public class CompressController extends BaseToolController {
@@ -34,7 +34,7 @@ public class CompressController extends BaseToolController {
     private ComboBox<String> unitComboBox;
 
     /**
-     * Configures the compression-specific toolbar UI, including mode selection 
+     * Configures the compression-specific toolbar UI, including mode selection
      * (Percentage vs Target Size) and dynamic input prompts.
      */
     @Override
@@ -78,7 +78,7 @@ public class CompressController extends BaseToolController {
     }
 
     /**
-     * Prepares the compression task by calculating the target size and 
+     * Prepares the compression task by calculating the target size and
      * initiating the iterative processing engine via the save dialog workflow.
      */
     @Override
@@ -113,16 +113,16 @@ public class CompressController extends BaseToolController {
                 double factor = 1.0 - (inputValue / 100.0);
                 targetSizeBytes = (long) (originalSizeBytes * factor);
             } else {
-                targetSizeBytes = unitComboBox.getValue().equals("MB") 
-                        ? (long) (inputValue * 1024 * 1024) 
+                targetSizeBytes = unitComboBox.getValue().equals("MB")
+                        ? (long) (inputValue * 1024 * 1024)
                         : (long) (inputValue * 1024);
             }
 
             // Optimization: If the file is already under the target, just copy it
             if (targetSizeBytes >= originalSizeBytes) {
                 Files.copy(sourceFile.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                Platform.runLater(() -> showAlert(Alert.AlertType.INFORMATION, "Notice", 
-                    "The original file is already smaller than your target size. File copied as-is."));
+                Platform.runLater(() -> showAlert(Alert.AlertType.INFORMATION, "Notice",
+                        "The original file is already smaller than your target size. File copied as-is."));
                 return;
             }
 
@@ -132,19 +132,19 @@ public class CompressController extends BaseToolController {
     }
 
     /**
-     * Progressively applies more aggressive compression strategies until 
+     * Progressively applies more aggressive compression strategies until
      * the target size is reached or strategies are exhausted.
      */
     private void executeIterativeCompression(File sourceFile, File destination, long targetSizeBytes) throws Exception {
         byte[] bestResult = null;
-        
+
         // Strategy matrix: { JPEG Quality (0.0-1.0), Image Scale Factor (0.0-1.0) }
         float[][] strategies = {
-            {0.8f, 1.0f}, // High quality, original dimensions
-            {0.6f, 1.0f}, // Medium quality, original dimensions
-            {0.4f, 0.8f}, // Low quality, 80% dimensions
-            {0.2f, 0.5f}, // Very low quality, 50% dimensions
-            {0.1f, 0.3f}  // Extreme compression
+                { 0.8f, 1.0f }, // High quality, original dimensions
+                { 0.6f, 1.0f }, // Medium quality, original dimensions
+                { 0.4f, 0.8f }, // Low quality, 80% dimensions
+                { 0.2f, 0.5f }, // Very low quality, 50% dimensions
+                { 0.1f, 0.3f } // Extreme compression
         };
 
         for (float[] strategy : strategies) {
@@ -152,13 +152,13 @@ public class CompressController extends BaseToolController {
             float scale = strategy[1];
 
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 PDDocument doc = loadDocumentSafe(sourceFile.getAbsolutePath())) {
-                
+                    PDDocument doc = loadDocumentSafe(sourceFile.getAbsolutePath())) {
+
                 compressImagesInDocument(doc, quality, scale);
                 doc.save(baos);
-                
+
                 bestResult = baos.toByteArray();
-                
+
                 // Exit early if we hit the user's target size
                 if (bestResult.length <= targetSizeBytes) {
                     break;
@@ -174,25 +174,29 @@ public class CompressController extends BaseToolController {
     }
 
     /**
-     * Traverses the PDF resources to find and re-encode images with new quality and scale.
+     * Traverses the PDF resources to find and re-encode images with new quality and
+     * scale.
      */
     private void compressImagesInDocument(PDDocument doc, float quality, float scaleFactor) throws Exception {
         for (PDPage page : doc.getPages()) {
             PDResources resources = page.getResources();
-            if (resources == null) continue;
+            if (resources == null)
+                continue;
 
             for (COSName name : resources.getXObjectNames()) {
                 PDXObject xObject = resources.getXObject(name);
-                
+
                 if (xObject instanceof PDImageXObject pdImage) {
                     BufferedImage bImage = pdImage.getImage();
-                    if (bImage == null) continue;
+                    if (bImage == null)
+                        continue;
 
                     // Calculate new dimensions
                     int newWidth = (int) (bImage.getWidth() * scaleFactor);
                     int newHeight = (int) (bImage.getHeight() * scaleFactor);
-                    
-                    if (newWidth < 10 || newHeight < 10) continue;
+
+                    if (newWidth < 10 || newHeight < 10)
+                        continue;
 
                     // Resize using AWT
                     BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
@@ -202,11 +206,25 @@ public class CompressController extends BaseToolController {
 
                     // Re-encode as a compressed JPEG XObject
                     PDImageXObject compressedImage = JPEGFactory.createFromImage(doc, resizedImage, quality);
-                    
+
                     // Replace the original resource in the PDF page
                     resources.put(name, compressedImage);
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty()) {
+            return false;
+        }
+        // Check if ALL files are actually PDFs
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

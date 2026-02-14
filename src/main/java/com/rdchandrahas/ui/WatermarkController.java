@@ -57,6 +57,9 @@ public class WatermarkController extends BaseToolController {
 
         watermarkInput = new TextField("CONFIDENTIAL");
         watermarkInput.setPrefWidth(150);
+        
+        // This makes the button update instantly as the user types the watermark text
+        watermarkInput.textProperty().addListener((obs, oldVal, newVal) -> updateActionBtnState());
 
         colorPicker = new ColorPicker(Color.DARKGRAY);
 
@@ -236,6 +239,19 @@ public class WatermarkController extends BaseToolController {
         ImageView iv = new ImageView(img); iv.setPreserveRatio(true); iv.setFitHeight(600);
         VBox v = new VBox(iv); v.setAlignment(Pos.CENTER); v.setPadding(new Insets(20)); v.setStyle("-fx-background-color:#252525;");
         s.setScene(new Scene(v, 500, 650)); s.show();
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        if (fileListView.getItems().isEmpty() || watermarkInput.getText().trim().isEmpty()) {
+            return false; 
+        }
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true; 
     }
 
     private record WatermarkConfig(String text, float fontSize, java.awt.Color color, float rotation, float opacity) {}

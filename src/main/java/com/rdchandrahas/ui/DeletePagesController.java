@@ -25,6 +25,9 @@ public class DeletePagesController extends BaseToolController {
         pageRangeInput.setPromptText("Pages to delete (e.g., 1, 3, 5-10)");
         pageRangeInput.setPrefWidth(250);
 
+        // Make the button update instantly as the user types the page range
+        pageRangeInput.textProperty().addListener((obs, oldVal, newVal) -> updateActionBtnState());
+
         addToolbarItem(pageRangeInput);
     }
 
@@ -49,6 +52,7 @@ public class DeletePagesController extends BaseToolController {
             File tempMerged = null;
             String sourcePath;
 
+            // If multiple files are added, merge them first before deleting pages
             if (filePaths.size() > 1) {
                 tempMerged = File.createTempFile("merged_temp", ".pdf");
                 mergeDocumentsSafe(filePaths, tempMerged);
@@ -80,6 +84,7 @@ public class DeletePagesController extends BaseToolController {
 
     private Set<Integer> parsePageRange(String rangeText, int maxPages) {
         Set<Integer> pages = new HashSet<>();
+        // Replace spaces with commas so spaces don't break the parsing
         String normalizedText = rangeText.replaceAll("\\s+", ",");
         String[] parts = normalizedText.split(",");
         
@@ -102,5 +107,19 @@ public class DeletePagesController extends BaseToolController {
             } catch (NumberFormatException ignored) {}
         }
         return pages;
+    }
+
+    @Override
+    protected boolean isInputValid() {
+        // FIXED: Used pageRangeInput instead of pagesField
+        if (fileListView.getItems().isEmpty() || pageRangeInput.getText().trim().isEmpty()) {
+            return false; 
+        }
+        for (FileItem item : fileListView.getItems()) {
+            if (!item.getPath().toLowerCase().endsWith(".pdf")) {
+                return false;
+            }
+        }
+        return true; 
     }
 }

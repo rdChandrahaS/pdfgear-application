@@ -8,28 +8,109 @@
 /* Global Text */
 .label { -fx-text-fill: #2c3e50; }
 
-/* --- Master Tool Layout Styling --- */
-.tool-header { 
-    -fx-background-color: #ffffff; 
-    -fx-padding: 15; 
+
+/* --- Professional Tool Layout Styling (Light) --- */
+.tool-header {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15 25;
     -fx-border-color: #e0e0e0;
     -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
 }
-.tool-header-title { 
-    -fx-font-size: 20px; 
-    -fx-font-weight: bold; 
-    -fx-text-fill: #2c3e50; 
+.tool-header-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
 }
-.tool-bar { 
-    -fx-background-color: #ffffff; 
-    -fx-padding: 12; 
-    -fx-background-radius: 8; 
+.back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #555555;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 6;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+.back-button:hover {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #222222;
+}
+
+.tool-bar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 12 15;
+    -fx-background-radius: 8;
     -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 5, 0, 0, 2);
 }
-.file-list-area { 
-    -fx-background-color: #ffffff; 
-    -fx-background-radius: 8; 
+
+/* Enhances the box area in light mode */
+.file-list-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-padding: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+.file-list-area {
+    -fx-background-color: transparent;
+}
+.list-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+}
+
+/* Modern Segmented Controls */
+.segmented-button-bar .toggle-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #555555;
+    -fx-border-color: #cccccc;
+    -fx-padding: 6 15;
+    -fx-cursor: hand;
+}
+.segmented-button-bar .toggle-button:selected {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+    -fx-border-color: -fx-accent;
+}
+.segmented-button-bar .left-pill {
+    -fx-background-radius: 6 0 0 6;
+    -fx-border-radius: 6 0 0 6;
+    -fx-border-width: 1 0 1 1;
+}
+.segmented-button-bar .right-pill {
+    -fx-background-radius: 0 6 6 0;
+    -fx-border-radius: 0 6 6 0;
+    -fx-border-width: 1 1 1 0;
+}
+
+/* Bottom Action Bar */
+.bottom-action-bar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15 20;
+    -fx-background-radius: 8;
     -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, -2);
+}
+.action-button {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 25;
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.3), 10, 0, 0, 2);
+    -fx-cursor: hand;
+}
+.action-button:hover {
+    -fx-background-color: #218838;
+    -fx-translate-y: -1;
 }
 
 /* --- Buttons --- */
@@ -79,25 +160,22 @@
 
 /* --- Dashboard Tool Cards --- */
 .tool-card {
-    -fx-background-color: white;
-    -fx-background-radius: 25;
-    -fx-border-radius: 25;
-    -fx-border-color: #e0e0e0;
-    -fx-border-width: 1;
-    -fx-padding: 30;
-    -fx-min-width: 160;
-    -fx-min-height: 160;
-    -fx-max-width: 160;
-    -fx-max-height: 160;
+    -fx-background-color: transparent; 
+    -fx-padding: 5; 
+    -fx-min-width: 120;
+    -fx-min-height: 140;
+    -fx-max-width: 120;
+    -fx-max-height: 140;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-transition: all 0.2s ease-in-out;
 }
+
 .tool-card:hover {
-    -fx-background-color: #f8f9fa;
-    -fx-border-color: -fx-accent;
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 120, 215, 0.4), 20, 0, 0, 0); /* Softer shadow for light mode */
 }
+
 .tool-icon {
     -icon-size: 50;
     -icon-color: -fx-accent;
@@ -108,7 +186,7 @@
     -fx-font-weight: bold;
 }
 
-/* --- Inputs & Menus --- */
+/* --- Inputs --- */
 .text-field, .password-field, .combo-box {
     -fx-background-color: #ffffff;
     -fx-text-fill: #333333;
@@ -118,18 +196,76 @@
 .text-field:focused, .password-field:focused, .combo-box:focused {
     -fx-border-color: -fx-accent;
 }
+
+/* ==========================================================
+   PROFESSIONAL MENU BAR STYLING (LIGHT)
+   ========================================================== */
 .menu-bar {
     -fx-background-color: #ffffff;
+    -fx-padding: 5 10 5 10;
     -fx-border-color: #e0e0e0;
     -fx-border-width: 0 0 1 0;
 }
-.menu-bar .label { -fx-text-fill: #333333; }
-.menu:hover, .menu:showing, .menu-item:focused { -fx-background-color: #e0e0e0; }
-.context-menu {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e0e0e0;
+
+.menu-bar > .container > .menu-button {
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s;
 }
-.menu-item .label { -fx-text-fill: #333333; }
+
+.menu-bar > .container > .menu-button > .label {
+    -fx-text-fill: #555555;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+}
+
+.menu-bar > .container > .menu-button:hover, 
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: #f0f0f0;
+}
+
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: #2c3e50;
+}
+
+/* Dropdown Window */
+.context-menu {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 5); 
+}
+
+/* Dropdown Items */
+.menu-item {
+    -fx-padding: 8 20 8 15;
+    -fx-background-radius: 5;
+}
+
+.menu-item > .label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 13px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: -fx-accent;
+}
+
+.menu-item:hover > .label, .menu-item:focused > .label {
+    -fx-text-fill: white;
+}
+
+/* Separator Line */
+.separator-menu-item .line {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 3 0 3 0;
+}
 
 /* --- ListView Styling --- */
 .list-view {
