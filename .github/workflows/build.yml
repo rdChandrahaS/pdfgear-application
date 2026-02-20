@@ -1,14 +1,13 @@
-name: Build My PDF Tool Installers
+name: Build and Release PDF Tools
 
 on:
   push:
+    branches: [ "main", "master" ]
     tags:
-      - 'v*' # Triggers the release ONLY when you push a tag like v1.0.0
-    branches: [ main, master ]
+      - 'v*' 
   pull_request:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
 
-# We need write permissions to create a release
 permissions:
   contents: write
 
@@ -18,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout Code
@@ -34,40 +33,52 @@ jobs:
       - name: Build Fat JAR with Maven
         run: mvn clean package -DskipTests
 
-      # WINDOWS BUILD STAGE
+      # --- WINDOWS BUILD STAGE ---
       - name: Build Windows EXE
         if: matrix.os == 'windows-latest'
         run: |
+          # Ensure the dist directory exists
+          mkdir dist -ErrorAction SilentlyContinue
+
+          # Run jpackage (PowerShell syntax)
           jpackage --type exe `
             --dest dist `
             --name "My PDF Tool" `
             --input target `
-            --main-jar my-pdf-file-application-0.0.1-SNAPSHOT-jar-with-dependencies.jar `
+            --main-jar "my-pdf-file-application-0.0.1-SNAPSHOT-jar-with-dependencies.jar" `
             --main-class com.rdchandrahas.Launcher `
-            --icon src/main/resources/icons/app-icon.ico `
+            --icon "src/main/resources/icons/app-icon.ico" `
             --win-shortcut `
             --win-dir-chooser `
-            --vendor "RdChandrahas"
+            --vendor "RdChandrahas" `
+            --app-version "1.0.0"
 
-      # LINUX BUILD STAGE
+      # --- LINUX BUILD STAGE ---
       - name: Build Linux DEB
         if: matrix.os == 'ubuntu-latest'
         run: |
+          # Install required tools for building .deb
           sudo apt-get update
-          sudo apt-get install -y fakeroot
+          sudo apt-get install -y fakeroot binutils
+
+          # Ensure the dist directory exists
+          mkdir -p dist
+
+          # Run jpackage (Bash syntax)
           jpackage --type deb \
             --dest dist \
-            --name "MyPDFTool" \
+            --name "mypdftool" \
             --input target \
-            --main-jar my-pdf-file-application-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
+            --main-jar "my-pdf-file-application-0.0.1-SNAPSHOT-jar-with-dependencies.jar" \
             --main-class com.rdchandrahas.Launcher \
-            --icon src/main/resources/icons/app-icon.png \
+            --icon "src/main/resources/icons/app-icon.png" \
             --linux-shortcut \
             --vendor "RdChandrahas" \
-            --description "Advanced PDF Manipulation Toolkit"
+            --description "Advanced PDF Manipulation Toolkit" \
+            --app-version "1.0.0"
 
-      # 1. STILL KEEP ARTIFACTS (for normal commits to main)
-      - name: Upload Artifacts
+      # 1. UPLOAD ARTIFACTS (Accessible in Actions tab for every push)
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-installer
