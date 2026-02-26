@@ -7,6 +7,8 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ public class BookmarkManagerService {
         }
     }
 
-    public void addBookmarks(String inputPath, String outputPath, List<BookmarkEntry> bookmarks) throws Exception {
+    public void addBookmarks(String inputPath, String outputPath, List<BookmarkEntry> bookmarks) throws IOException,GeneralSecurityException {
         LOGGER.log(Level.INFO, "Adding bookmarks to {0}", inputPath);
 
         try (PDDocument document = PDDocument.load(new File(inputPath), PdfService.getGlobalMemorySetting())) {
@@ -53,8 +55,7 @@ public class BookmarkManagerService {
                     
                     outline.addLast(bookmarkItem);
                 } else {
-                    LOGGER.log(Level.WARNING, "Invalid page number {0} for bookmark '{1}'", 
-                            new Object[]{entry.pageNumber, entry.title});
+                    LOGGER.log(Level.WARNING, "Invalid page number {0} for bookmark '{1}'", new Object[]{entry.pageNumber, entry.title});
                 }
             }
 

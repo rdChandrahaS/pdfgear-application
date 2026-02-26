@@ -1,6 +1,7 @@
 package com.rdchandrahas.ui;
 
 import com.rdchandrahas.shared.model.FileItem;
+import com.rdchandrahas.shared.util.TempFileManager;
 import com.rdchandrahas.ui.base.BaseToolController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -56,7 +57,7 @@ public class DeletePagesController extends BaseToolController {
             String sourcePath;
 
             if (filePaths.size() > 1) {
-                tempMerged = File.createTempFile("merged_temp", ".pdf");
+                tempMerged = TempFileManager.createTempFile("merged_temp_", ".pdf");
                 mergeDocumentsSafe(filePaths, tempMerged);
                 sourcePath = tempMerged.getAbsolutePath();
             } else {

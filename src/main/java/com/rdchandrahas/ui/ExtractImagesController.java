@@ -15,6 +15,8 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class ExtractImagesController extends BaseToolController {
 
@@ -76,7 +78,7 @@ public class ExtractImagesController extends BaseToolController {
     /**
      * Helper method to reduce complexity of handleAction.
      */
-    private int extractImagesFromPdf(File sourceFile, File destDir) throws Exception {
+    private int extractImagesFromPdf(File sourceFile, File destDir) throws IOException,GeneralSecurityException {
         int count = 0;
         String baseName = sourceFile.getName().replaceFirst("[.][^.]+$", "");
 

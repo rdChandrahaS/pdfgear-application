@@ -1,6 +1,7 @@
 package com.rdchandrahas.ui;
 
 import com.rdchandrahas.shared.model.FileItem;
+import com.rdchandrahas.shared.util.TempFileManager;
 import com.rdchandrahas.ui.base.BaseToolController;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -74,7 +75,7 @@ public class RotateController extends BaseToolController {
             try {
                 String sourcePath;
                 if (filePaths.size() > 1) {
-                    tempMerged = File.createTempFile("rotate_merged_", ".pdf");
+                    tempMerged = TempFileManager.createTempFile("rotate_merged_", ".pdf");
                     mergeDocumentsSafe(filePaths, tempMerged);
                     sourcePath = tempMerged.getAbsolutePath();
                 } else {

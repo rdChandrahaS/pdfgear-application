@@ -21,6 +21,14 @@ public class MainApp extends Application {
     private static Scene scene;
 
     /**
+     * Static setter to resolve SonarQube issue (squid:S2696)
+     * "Make the enclosing method 'static' or remove this set."
+     */
+    private static void setGlobalScene(Scene newScene) {
+        scene = newScene;
+    }
+
+    /**
      * The main entry point for all JavaFX applications.
      */
     @Override
@@ -38,8 +46,8 @@ public class MainApp extends Application {
         MainController controller = loader.getController();
         controller.initService(osService);
 
-        // 4. Setup the Scene and Stage dimensions
-        scene = new Scene(root, 1000, 700);
+        // 4. Setup the Scene and Stage dimensions using the static setter
+        setGlobalScene(new Scene(root, 1000, 700));
 
         primaryStage.setTitle("My PDF File Desktop");
         primaryStage.setScene(scene);
@@ -47,9 +55,7 @@ public class MainApp extends Application {
         primaryStage.setMinHeight(600);
         
         // 5. Explicitly handle the "X" close button
-        primaryStage.setOnCloseRequest(event -> {
-            shutdownApplication();
-        });
+        primaryStage.setOnCloseRequest(event -> shutdownApplication());
         
         primaryStage.show();
     }

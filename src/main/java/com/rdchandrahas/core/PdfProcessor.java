@@ -1,5 +1,7 @@
 package com.rdchandrahas.core;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 /**
@@ -15,5 +17,5 @@ public interface PdfProcessor {
      * @param outputFile The absolute file path where the merged PDF will be saved.
      * @throws Exception If a file is missing, encrypted, or a write error occurs during processing.
      */
-    void merge(List<String> inputFiles, String outputFile) throws Exception;
+    void merge(List<String> inputFiles, String outputFile) throws IOException,GeneralSecurityException;
 }

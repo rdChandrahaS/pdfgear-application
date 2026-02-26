@@ -26,9 +26,11 @@ public class SplitController extends BaseToolController {
     @Override
     protected void handleAction() {
         processWithSaveDialog("Save Split Files", "Split_Output.pdf", (dest) -> {
-            String base = dest.getAbsolutePath().replace(".pdf", "");
-            
-            try (PDDocument doc = loadDocumentSafe(fileListView.getItems().get(0).getPath())) {
+
+            String base = dest.getAbsolutePath().replaceAll("(?i)\\.pdf$", "");   
+
+            try (PDDocument doc = loadDocumentSafe(fileListView.getItems().get(0).getPath())) {                
+                
                 int totalPages = doc.getNumberOfPages();
                 LOGGER.log(Level.INFO, "Starting PDF split for {0} pages...", totalPages);
                 

@@ -5,8 +5,9 @@ import com.rdchandrahas.ui.base.BaseToolController;
 import com.rdchandrahas.core.ImageToPdfService;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ImageToPdfController extends BaseToolController {
     private ComboBox<String> layout;
@@ -29,13 +30,16 @@ public class ImageToPdfController extends BaseToolController {
     @Override
     protected void handleAction() {
         processWithSaveDialog("Save PDF", "Images.pdf", (dest) -> {
-            // FIX: Delegate to the memory-safe ImageToPdfService instead of processing in RAM
             List<String> imagePaths = fileListView.getItems().stream()
                     .map(FileItem::getPath)
-                    .collect(Collectors.toList());
+                    .toList();
             
             ImageToPdfService service = new ImageToPdfService();
-            service.convertImagesToPdf(imagePaths, dest.getAbsolutePath());
+            try {
+                service.convertImagesToPdf(imagePaths, dest.getAbsolutePath());
+            } catch (Exception e) {
+                throw new IOException("Failed to convert images to PDF: " + e.getMessage(), e);
+            }
         });
     }
 
@@ -44,12 +48,10 @@ public class ImageToPdfController extends BaseToolController {
         if (fileListView.getItems().isEmpty()) {
             return false;
         }
-        for (FileItem item : fileListView.getItems()) {
+        return fileListView.getItems().stream().allMatch(item -> {
             String path = item.getPath().toLowerCase();
-            if (!path.endsWith(".jpg") && !path.endsWith(".jpeg") && !path.endsWith(".png") && !path.endsWith(".webp")) {
-                return false; 
-            }
-        }
-        return true;
+            return path.endsWith(".jpg") || path.endsWith(".jpeg") || 
+                   path.endsWith(".png") || path.endsWith(".webp");
+        });
     }
 }

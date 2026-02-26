@@ -20,6 +20,7 @@ public class FileListCell extends ListCell<FileItem> {
     private final ImageView imageView = new ImageView();
     private final VBox textBox = new VBox(4);
     private final HBox container = new HBox(10);
+    private String currentFilePath = null;
 
     /**
      * Constructs a new FileListCell with a horizontal layout and fixed thumbnail scaling.
@@ -44,40 +45,39 @@ public class FileListCell extends ListCell<FileItem> {
     protected void updateItem(FileItem item, boolean empty) {
         super.updateItem(item, empty);
 
-        // Reset the cell if it is empty or has no data
         if (empty || item == null) {
+            currentFilePath = null;
             setText(null);
             setGraphic(null);
             return;
         }
 
-        // Clear existing labels to prevent duplication during cell reuse
         textBox.getChildren().clear();
-
-        // Create labels for file metadata
         Label nameLabel = new Label(item.getName());
-        nameLabel.setStyle("-fx-font-weight: bold;"); // Visual distinction for the filename
-        
-        Label sizeLabel = new Label(
-                FileUtils.formatSize(item.getSize())
-        );
-        sizeLabel.getStyleClass().add("secondary-label"); // Assuming a secondary style for metadata
-
+        nameLabel.setStyle("-fx-font-weight: bold;");
+        Label sizeLabel = new Label(com.rdchandrahas.shared.util.FileUtils.formatSize(item.getSize()));
+        sizeLabel.getStyleClass().add("secondary-label");
         textBox.getChildren().addAll(nameLabel, sizeLabel);
 
-        // Clear previous image to avoid flickering while the new one loads
-        imageView.setImage(null);
+        if (!item.getPath().equals(currentFilePath)) {
+            currentFilePath = item.getPath();
+            imageView.setImage(null);
 
-        /*
-         * Asynchronously load the PDF thumbnail.
-         * PdfThumbnailUtil manages the background rendering and image caching.
-         */
-        PdfThumbnailUtil.loadThumbnailAsync(
-                item.getPath(),
-                imageView::setImage
-        );
-
-        // Display the populated container as the cell's graphic
+            javafx.scene.image.Image cachedImage = com.rdchandrahas.shared.util.ThumbnailCache.get(item.getPath());
+            if (cachedImage != null) {
+                imageView.setImage(cachedImage);
+            } else {
+                PdfThumbnailUtil.loadThumbnailAsync(
+                        item.getPath(),
+                        () -> !item.getPath().equals(currentFilePath),
+                        img -> {
+                            if (item.getPath().equals(currentFilePath)) {
+                                imageView.setImage(img);
+                            }
+                        }
+                );
+            }
+        }
         setGraphic(container);
     }
 }

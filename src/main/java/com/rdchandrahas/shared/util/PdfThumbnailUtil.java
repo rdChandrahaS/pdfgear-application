@@ -7,54 +7,59 @@ import javafx.scene.image.Image;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
+import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-/**
- * PdfThumbnailUtil handles the generation and asynchronous loading of file previews.
- * It supports both PDF documents (rendering the first page) and standard image formats,
- * ensuring the UI remains responsive by offloading heavy rendering tasks to background threads.
- */
 public class PdfThumbnailUtil {
 
     private PdfThumbnailUtil() {
         throw new IllegalStateException("Utility class");
     }
     
-    /** Set of supported image extensions for direct thumbnail loading. */
     private static final Set<String> IMAGE_EXTENSIONS = Set.of(
             ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"
     );
 
-    /**
-     * Synchronously generates a thumbnail Image for a given file.
-     * For images, it loads a scaled version. For PDFs, it renders the first page at 72 DPI.
-     *
-     * @param file The file to preview.
-     * @return A JavaFX Image object, or null if rendering fails.
-     */
     public static Image generateThumbnail(File file) {
         String filename = file.getName().toLowerCase();
 
-        // Handle direct image files
         if (isImage(filename)) {
-            try (FileInputStream fis = new FileInputStream(file)) {
-                // Request a 200px width thumbnail while preserving aspect ratio
-                return new Image(fis, 200, 0, true, true);
+            try {
+                // Attempt native fast-loading (works for JPG, PNG)
+                Image img = new Image(file.toURI().toString(), 200, 0, true, true);
+                if (!img.isError()) {
+                    return img;
+                }
+                
+                // Fallback for WEBP and others: Read using ImageIO
+                BufferedImage bImg = ImageIO.read(file);
+                if (bImg != null) {
+                    // FIX: Force scale down the massive fallback image to 200px to save RAM
+                    int targetWidth = 200;
+                    int targetHeight = (int) (bImg.getHeight() * ((double) targetWidth / bImg.getWidth()));
+                    
+                    BufferedImage resizedImg = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g2d = resizedImg.createGraphics();
+                    g2d.drawImage(bImg.getScaledInstance(targetWidth, targetHeight, java.awt.Image.SCALE_FAST), 0, 0, null);
+                    g2d.dispose();
+                    
+                    bImg.flush(); // Instantly free the huge original image from RAM
+
+                    return SwingFXUtils.toFXImage(resizedImg, null);
+                }
             } catch (Exception e) {
                 return null;
             }
         }
 
-        // Handle PDF document rendering
         try (PDDocument document = PDDocument.load(file)) {
             PDFRenderer renderer = new PDFRenderer(document);
-            // Render the first page (index 0) at standard screen resolution (72 DPI)
             BufferedImage bufferedImage = renderer.renderImageWithDPI(0, 72);
-            // Convert Swing BufferedImage to JavaFX Image
             return SwingFXUtils.toFXImage(bufferedImage, null);
         } catch (Exception e) {
             return null;
@@ -62,38 +67,44 @@ public class PdfThumbnailUtil {
     }
 
     /**
-     * Loads a thumbnail asynchronously using the ExecutionManager.
-     * It checks the cache first, generates the image if missing, and updates the UI via Platform.runLater.
-     *
-     * @param filePath The absolute path of the file.
-     * @param callback A consumer function to handle the resulting Image on the UI thread.
+     * Loads a thumbnail asynchronously with task cancellation support.
+     * Prevents processing thumbnails for cells that have already scrolled off-screen.
      */
-    public static void loadThumbnailAsync(String filePath, Consumer<Image> callback) {
+    public static void loadThumbnailAsync(String filePath, BooleanSupplier isCancelled, Consumer<Image> callback) {
         ExecutionManager.submit(() -> {
-            File file = new File(filePath);
+            // 1. Abort immediately if the user already scrolled past this cell
+            if (isCancelled.getAsBoolean()) return; 
             
-            // Attempt to retrieve from the memory cache using the absolute path as key
+            File file = new File(filePath);
             Image thumbnail = ThumbnailCache.get(file.getAbsolutePath());
 
             if (thumbnail == null) {
+                // 2. Abort before reading the file from the hard drive (Saves CPU/Disk I/O)
+                if (isCancelled.getAsBoolean()) return; 
+                
                 thumbnail = generateThumbnail(file);
+                
                 if (thumbnail != null) {
-                    // Store the newly generated thumbnail in cache for future use
                     ThumbnailCache.put(file.getAbsolutePath(), thumbnail);
                 }
             }
 
+            // 3. Abort before pushing to the UI thread
+            if (isCancelled.getAsBoolean()) return; 
+
             final Image result = thumbnail;
-            // Return the result to the JavaFX Application Thread
             Platform.runLater(() -> callback.accept(result));
         });
     }
 
     /**
-     * Helper to determine if a file is an image based on its extension.
-     * * @param filename The name of the file.
-     * @return true if the extension matches IMAGE_EXTENSIONS.
+     * Overloaded fallback method. 
+     * Keeps backward compatibility for other code that doesn't need task cancellation.
      */
+    public static void loadThumbnailAsync(String filePath, Consumer<Image> callback) {
+        loadThumbnailAsync(filePath, () -> false, callback);
+    }
+
     private static boolean isImage(String filename) {
         for (String ext : IMAGE_EXTENSIONS) {
             if (filename.endsWith(ext)) return true;

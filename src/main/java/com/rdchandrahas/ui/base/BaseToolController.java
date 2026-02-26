@@ -20,6 +20,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 /**
@@ -102,7 +103,7 @@ public abstract class BaseToolController implements SortableToolController {
             // FIX: Convert files to FileItems in memory first
             List<FileItem> newItems = files.stream()
                     .map(f -> new FileItem(f.getAbsolutePath()))
-                    .collect(java.util.stream.Collectors.toList());
+                    .toList();
 
             // FIX: Add all items at once. This ensures the ListChangeListener 
             // in FileListView only triggers ONE refresh cycle instead of thousands.
@@ -165,7 +166,7 @@ public abstract class BaseToolController implements SortableToolController {
      * Centralized execution method. 
      * Injects the global UI memory settings dynamically and handles closing streams automatically.
      */
-    protected void processPdfSafely(File inputFile, File outputFile, PdfOperation operation) throws Exception {
+    protected void processPdfSafely(File inputFile, File outputFile, PdfOperation operation) throws IOException, GeneralSecurityException {
         try (PDDocument document = PDDocument.load(inputFile, PdfService.getGlobalMemorySetting())) {
             operation.execute(document);
             document.save(outputFile);
@@ -190,8 +191,12 @@ public abstract class BaseToolController implements SortableToolController {
      * Delegates to the highly-optimized PdfService to prevent OS file limits
      * and memory exhaustion on massive batches.
      */
-    protected void mergeDocumentsSafe(List<String> paths, File dest) throws Exception {
-        pdfService.merge(paths, dest.getAbsolutePath());
+    protected void mergeDocumentsSafe(List<String> paths, File dest) throws IOException, GeneralSecurityException {
+        try {
+            pdfService.merge(paths, dest.getAbsolutePath());
+        } catch (Exception e) {
+            throw new IOException("Merge operation failed", e);
+        }
     }
 
     // --- Interface Implementations & Helpers ---
@@ -217,7 +222,7 @@ public abstract class BaseToolController implements SortableToolController {
 
     @FunctionalInterface 
     public interface ToolTask { 
-        void execute(File destination) throws Exception; 
+        void execute(File destination) throws IOException, GeneralSecurityException; 
     }
 
     protected void logInfo(String message) {

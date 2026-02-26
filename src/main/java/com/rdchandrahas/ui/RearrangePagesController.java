@@ -6,11 +6,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RearrangePagesController extends BaseToolController {
 
+    private static final Logger LOGGER = Logger.getLogger(RearrangePagesController.class.getName());
     private TextField orderInput;
 
     @Override
@@ -27,8 +31,6 @@ public class RearrangePagesController extends BaseToolController {
 
     @Override
     protected void handleAddFiles() {
-        // FIX: Force single-file logic to prevent user confusion. 
-        // Rearranging multiple identical documents is an edge case that causes logic bugs.
         fileListView.getItems().clear(); 
         addFiles("PDF Files", "*.pdf");
     }
@@ -49,10 +51,13 @@ public class RearrangePagesController extends BaseToolController {
                  PDDocument finalDoc = createDocumentSafe()) {
 
                 int maxPages = sourceDoc.getNumberOfPages();
-                List<Integer> newOrder = parsePageOrder(orderText, maxPages);
+                
+                // FIX: Removed unused 'maxPages' parameter to fix SonarQube warning
+                List<Integer> newOrder = parsePageOrder(orderText);
 
                 if (newOrder.isEmpty()) {
-                    throw new Exception("Invalid page order provided.");
+                    // FIX: Replaced generic Exception with IOException to match the ToolTask signature
+                    throw new IOException("Invalid page order provided.");
                 }
 
                 for (int pageNum : newOrder) {
@@ -66,34 +71,39 @@ public class RearrangePagesController extends BaseToolController {
         });
     }
 
-    private List<Integer> parsePageOrder(String rangeText, int maxPages) {
+    private List<Integer> parsePageOrder(String rangeText) {
         List<Integer> pages = new ArrayList<>();
         String normalizedText = rangeText.replaceAll("\\s+", ""); 
         String[] parts = normalizedText.split(",");
 
         for (String part : parts) {
-            if (part.isEmpty())
-                continue;
-            try {
-                if (part.contains("-")) {
-                    String[] bounds = part.split("-");
+            if (!part.isEmpty()) {
+                processOrderPart(part, pages);
+            }
+        }
+        return pages;
+    }
+
+    private void processOrderPart(String part, List<Integer> pages) {
+        try {
+            if (part.contains("-")) {
+                String[] bounds = part.split("-");
+                if (bounds.length == 2) {
                     int start = Integer.parseInt(bounds[0]);
                     int end = Integer.parseInt(bounds[1]);
 
                     if (start <= end) {
-                        for (int i = start; i <= end; i++)
-                            pages.add(i);
+                        for (int i = start; i <= end; i++) pages.add(i);
                     } else {
-                        for (int i = start; i >= end; i--)
-                            pages.add(i);
+                        for (int i = start; i >= end; i--) pages.add(i);
                     }
-                } else {
-                    pages.add(Integer.parseInt(part));
                 }
-            } catch (NumberFormatException ignored) {
+            } else {
+                pages.add(Integer.parseInt(part));
             }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Ignored invalid page number format: {0}", part);
         }
-        return pages;
     }
 
     @Override

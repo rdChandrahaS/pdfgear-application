@@ -71,6 +71,12 @@
             <version>1.78.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

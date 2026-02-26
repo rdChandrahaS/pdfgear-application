@@ -17,7 +17,9 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -31,7 +33,7 @@ public class DigitalSignatureService {
 
     private static final Logger LOGGER = Logger.getLogger(DigitalSignatureService.class.getName());
 
-    public void signPdf(String inputPath, String outputPath, String keystorePath, String password) throws Exception {
+    public void signPdf(String inputPath, String outputPath, String keystorePath, String password) throws IOException,GeneralSecurityException {
         LOGGER.log(Level.INFO, "Starting Digital Signature for {0}", inputPath);
 
         KeyStore keystore = KeyStore.getInstance("PKCS12");

@@ -1,100 +1,83 @@
 package com.rdchandrahas.shared.util;
 
 import javafx.scene.image.Image;
+import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * ThumbnailCache provides an in-memory storage solution for generated thumbnails.
- * It uses a thread-safe ConcurrentHashMap and implements a simple memory-limit 
- * enforcement strategy to prevent the application from consuming excessive RAM.
+ * It uses a thread-safe ConcurrentHashMap with SoftReferences to allow the JVM 
+ * to automatically free memory if the system runs out of RAM.
  */
 public class ThumbnailCache {
+
+    private static final Logger LOGGER = Logger.getLogger(ThumbnailCache.class.getName());
 
     private ThumbnailCache() {
         throw new IllegalStateException("Utility class");
     }
     
-    /** Thread-safe storage for images, keyed by their absolute file system path. */
-    private static final Map<String, Image> cache = new ConcurrentHashMap<>();
+    private static final Map<String, SoftReference<Image>> cache = new ConcurrentHashMap<>();
 
-    /** Default memory limit: 500 MB (expressed in bytes). */
     private static long maxSizeBytes = 500L * 1024L * 1024L;
     
-    /** Tracking variable for the estimated current memory footprint of the cache. */
     private static long currentSizeBytes = 0;
 
-    /**
-     * Updates the maximum allowed cache size at runtime.
-     * * @param bytes The new limit in bytes.
-     */
     public static void setMaxSizeBytes(long bytes) {
         maxSizeBytes = bytes;
-        System.out.println("Cache limit updated to: " + (bytes / (1024 * 1024)) + " MB");
+        LOGGER.log(Level.INFO, "Cache limit updated to: {0} MB", (bytes / (1024 * 1024)));
         enforceLimit();
     }
 
-    /**
-     * Retrieves an image from the cache.
-     * * @param path The absolute path of the file used as the key.
-     * @return The cached Image, or null if not found.
-     */
     public static Image get(String path) {
-        return cache.get(path);
+        if (path == null) return null;
+        SoftReference<Image> ref = cache.get(path);
+        if (ref != null) {
+            Image image = ref.get();
+            if (image != null) {
+                return image;
+            } else {
+                cache.remove(path);
+            }
+        }
+        return null;
     }
 
-    /**
-     * Adds an image to the cache and estimates its memory usage.
-     * * @param path  The absolute path of the file.
-     * @param image The JavaFX Image object to store.
-     */
     public static void put(String path, Image image) {
-        if (image == null) return;
+        if (image == null || path == null) return;
 
-        /* * Estimate memory size: Width * Height * 4 bytes.
-         * This assumes a standard 32-bit (ARGB) color depth per pixel.
-         */
         long imgSize = (long) (image.getWidth() * image.getHeight() * 4);
 
-        // Safety check: If a single image is larger than the entire limit, do not cache it.
         if (imgSize > maxSizeBytes) return;
 
-        // Add to cache and update usage tracker
-        cache.put(path, image);
+        cache.put(path, new SoftReference<>(image));
         currentSizeBytes += imgSize;
 
-        // Check if the new total exceeds the defined memory threshold
         enforceLimit();
     }
 
-    /**
-     * Checks if a thumbnail for the given path is already cached.
-     * * @param path The absolute path to check.
-     * @return true if the image is in the cache.
-     */
     public static boolean contains(String path) {
-        return cache.containsKey(path);
+        SoftReference<Image> ref = cache.get(path);
+        return ref != null && ref.get() != null;
     }
 
-    /**
-     * Clears the entire cache and resets the memory usage counter.
-     */
     public static void clear() {
         cache.clear();
         currentSizeBytes = 0;
-        System.out.println("Cache cleared to free system memory.");
+        LOGGER.log(Level.INFO, "Cache cleared to free system memory.");
     }
 
-    /**
-     * Internal logic to prevent memory overflow. 
-     * If the current usage exceeds the limit, the cache is flushed.
-     * * SUGGESTION: For a more advanced implementation, consider using a 
-     * LinkedHashMap with access-order to implement a Least Recently Used (LRU) 
-     * eviction policy instead of a full flush.
-     */
     private static void enforceLimit() {
         if (currentSizeBytes > maxSizeBytes) {
             clear();
         }
+    }
+
+    public static void remove(String path) {
+        if (path == null) return;
+        cache.remove(path);
     }
 }

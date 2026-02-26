@@ -2,49 +2,42 @@ package com.rdchandrahas.shared.component;
 
 import com.rdchandrahas.shared.model.FileItem;
 import com.rdchandrahas.shared.model.ViewMode;
-import com.rdchandrahas.shared.util.PdfThumbnailUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.ListView;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.StackPane;
+import org.controlsfx.control.GridView;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * FileListView is a hybrid component that supports displaying files in either 
- * a traditional list view or a visual tile/grid view.
- */
 public class FileListView extends StackPane {
 
     private final ObservableList<FileItem> items = FXCollections.observableArrayList();
     private final ListView<FileItem> listView = new ListView<>(items);
-    private final TilePane gridPane = new TilePane();
-    private final ScrollPane gridScroll = new ScrollPane(gridPane);
+    
+    private final GridView<FileItem> gridView = new GridView<>(items);
     
     private ViewMode currentMode = ViewMode.LIST;
 
     public FileListView() {
-        // --- Grid Layout Configuration ---
-        gridPane.setHgap(20);
-        gridPane.setVgap(20);
-        gridPane.setPrefTileWidth(180);
-        gridPane.setPrefTileHeight(240);
-        gridPane.setAlignment(Pos.TOP_LEFT);
-        
-        gridPane.getStyleClass().add("grid-pane-container");
+        // Configure GridView UI
+        gridView.setCellWidth(180);
+        gridView.setCellHeight(240);
+        gridView.setHorizontalCellSpacing(20);
+        gridView.setVerticalCellSpacing(20);
+        gridView.setCellFactory(grid -> new FileGridCell());
+        gridView.getStyleClass().add("grid-pane-container");
 
-        gridScroll.setFitToWidth(true);
-        gridScroll.setPannable(true);
-        gridScroll.getStyleClass().add("grid-scroll");
-
-        getChildren().addAll(listView, gridScroll);
+        // Add both views to the StackPane
+        getChildren().addAll(listView, gridView);
 
         setupListView();
-        setupGridView();
         setupDesktopDropSupport();
         
         setViewMode(ViewMode.LIST);
@@ -52,66 +45,6 @@ public class FileListView extends StackPane {
 
     private void setupListView() {
         listView.setCellFactory(lv -> new FileListCell());
-    }
-
-    private void setupGridView() {
-        items.addListener((javafx.collections.ListChangeListener<FileItem>) c -> refreshGrid());
-        refreshGrid();
-    }
-
-    private void refreshGrid() {
-        gridPane.getChildren().clear();
-        
-        // MEMORY PROTECTION: TilePane is not virtualized. Attempting to render 5,000 
-        // ImageViews simultaneously will cause an OutOfMemory error.
-        // We limit the grid to 500, but the ListView can handle unlimited files safely.
-        int displayLimit = Math.min(items.size(), 500);
-        List<VBox> newCards = new ArrayList<>();
-
-        for (int i = 0; i < displayLimit; i++) {
-            FileItem item = items.get(i);
-            newCards.add(createGridCard(item, i));
-        }
-        
-        // FIX: Batch Add to UI to prevent stuttering
-        gridPane.getChildren().addAll(newCards);
-
-        // Notify user if grid is truncated
-        if (items.size() > displayLimit) {
-            Label warning = new Label("Showing first " + displayLimit + " thumbnails. Switch to List View to see all " + items.size() + " files.");
-            warning.setStyle("-fx-font-weight: bold; -fx-text-fill: #ff6b6b; -fx-padding: 20;");
-            gridPane.getChildren().add(warning);
-        }
-    }
-
-    private VBox createGridCard(FileItem item, int index) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.TOP_CENTER);
-        
-        // FIX: Strictly lock dimensions to prevent massive CPU calculations during window resize
-        card.setPrefSize(170, 240);
-        card.setMinSize(170, 240);
-        card.setMaxSize(170, 240);
-        card.getStyleClass().add("grid-card");
-
-        ImageView image = new ImageView();
-        image.setFitWidth(150);
-        image.setFitHeight(180);
-        image.setPreserveRatio(true); 
-
-        Label name = new Label(item.getName());
-        // FIX: Removed 'name.setWrapText(true)' which causes the JavaFX Layout engine to crash on resize.
-        name.setWrapText(false);
-        name.setTextOverrun(OverrunStyle.ELLIPSIS); // Cuts off long text safely with "..."
-        name.setPrefWidth(160);
-        name.setAlignment(Pos.CENTER);
-
-        PdfThumbnailUtil.loadThumbnailAsync(item.getPath(), image::setImage);
-        
-        card.getChildren().addAll(image, name);
-        enableDragReorderGrid(card, index);
-        
-        return card;
     }
 
     private void setupDesktopDropSupport() {
@@ -126,17 +59,16 @@ public class FileListView extends StackPane {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasFiles()) {
-                // FIX: Batch Drag-and-Drop addition
                 List<FileItem> droppedItems = new ArrayList<>();
                 for (File file : db.getFiles()) {
                     String name = file.getName().toLowerCase();
-                    if (name.endsWith(".pdf") || name.endsWith(".jpg") || name.endsWith(".png")) {
+                    if (name.endsWith(".pdf") || name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name.endsWith(".webp")) {
                         droppedItems.add(new FileItem(file.getAbsolutePath()));
                     }
                 }
                 
                 if (!droppedItems.isEmpty()) {
-                    items.addAll(droppedItems); // Trigger refreshGrid only once
+                    items.addAll(droppedItems);
                     success = true;
                 }
             }
@@ -145,51 +77,28 @@ public class FileListView extends StackPane {
         });
     }
 
-    private void enableDragReorderGrid(VBox card, int index) {
-        card.setOnDragDetected(event -> {
-            Dragboard db = card.startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(String.valueOf(index));
-            db.setContent(content);
-            event.consume();
-        });
-
-        card.setOnDragOver(event -> {
-            if (event.getGestureSource() != card && event.getDragboard().hasString()) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
-
-        card.setOnDragDropped(event -> {
-            try {
-                int draggedIndex = Integer.parseInt(event.getDragboard().getString());
-                FileItem draggedItem = items.remove(draggedIndex);
-                items.add(index, draggedItem);
-                event.setDropCompleted(true);
-            } catch (Exception e) {
-                event.setDropCompleted(false);
-            }
-            event.consume();
-        });
-    }
-
     public void setViewMode(ViewMode mode) {
         this.currentMode = mode;
         listView.setVisible(mode == ViewMode.LIST);
-        gridScroll.setVisible(mode == ViewMode.GRID);
+        gridView.setVisible(mode == ViewMode.GRID);
     }
 
-    public ViewMode getViewMode() {
-        return currentMode;
-    }
+    public ViewMode getViewMode() { return currentMode; }
 
     public ObservableList<FileItem> getItems() { return items; }
     
-    public FileItem getSelectedItem() { return listView.getSelectionModel().getSelectedItem(); }
+    public FileItem getSelectedItem() { 
+        if(currentMode == ViewMode.LIST) {
+            return listView.getSelectionModel().getSelectedItem(); 
+        }
+        return null;
+    }
     
     public void sortByName(boolean ascending) {
-        items.sort((a, b) -> ascending ? a.getName().compareToIgnoreCase(b.getName()) : b.getName().compareToIgnoreCase(a.getName()));
+        items.sort((a, b) -> {
+            int result = compareAlphanumeric(a.getName(), b.getName());
+            return ascending ? result : -result;
+        });
     }
 
     public void sortBySize(boolean ascending) {
@@ -197,5 +106,45 @@ public class FileListView extends StackPane {
             int result = Long.compare(a.getSize(), b.getSize());
             return ascending ? result : -result;
         });
+    }
+
+    private int compareAlphanumeric(String s1, String s2) {
+        if (s1 == null || s2 == null) return s1 == null ? (s2 == null ? 0 : -1) : 1;
+
+        List<String> chunks1 = extractChunks(s1);
+        List<String> chunks2 = extractChunks(s2);
+
+        int minLen = Math.min(chunks1.size(), chunks2.size());
+        for (int i = 0; i < minLen; i++) {
+            String chunk1 = chunks1.get(i);
+            String chunk2 = chunks2.get(i);
+
+            if (isDigit(chunk1.charAt(0)) && isDigit(chunk2.charAt(0))) {
+                try {
+                    long num1 = Long.parseLong(chunk1);
+                    long num2 = Long.parseLong(chunk2);
+                    int result = Long.compare(num1, num2);
+                    if (result != 0) return result;
+                } catch (NumberFormatException e) {
+                    int result = chunk1.compareToIgnoreCase(chunk2);
+                    if (result != 0) return result;
+                }
+            } else {
+                int result = chunk1.compareToIgnoreCase(chunk2);
+                if (result != 0) return result;
+            }
+        }
+        return Integer.compare(chunks1.size(), chunks2.size());
+    }
+
+    private List<String> extractChunks(String s) {
+        List<String> chunks = new ArrayList<>();
+        Matcher matcher = Pattern.compile("(\\d+|\\D+)").matcher(s);
+        while (matcher.find()) chunks.add(matcher.group());
+        return chunks;
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 }
